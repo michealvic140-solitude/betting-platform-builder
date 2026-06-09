@@ -2685,6 +2685,7 @@ function AnalyticsPanel() {
             </div>
           </div>
         </PanelBlock>
+        <div className="min-w-0"><TopBetsPanel /></div>
       </div>
 
       {/* ROW 9 — 5 module tiles */}
@@ -2711,8 +2712,6 @@ function AnalyticsPanel() {
       </div>
 
       {/* ROW 10 — System Status */}
-      <TopBetsPanel />
-
       <Card className="border-primary/20 bg-card/60 p-3">
         <div className="text-[10px] sm:text-xs font-bold tracking-widest text-primary mb-2">SYSTEM STATUS <span className="text-muted-foreground font-normal">(COMING SOON)</span></div>
         <div className="grid grid-cols-5 gap-1 sm:gap-2">
