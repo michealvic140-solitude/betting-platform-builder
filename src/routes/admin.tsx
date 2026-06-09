@@ -1089,6 +1089,7 @@ function MatchesPanel() {
   const confirm = useConfirm();
   const [matches, setMatches] = useState<any[]>([]);
   const [wizard, setWizard] = useState(false);
+  const [shooterWizard, setShooterWizard] = useState(false);
 
   async function load() {
     const { data } = await supabase.from("matches").select("*, home_team:teams!home_team_id(name,logo_url), away_team:teams!away_team_id(name,logo_url)").eq("is_archived", false).order("start_time", { ascending: false });
@@ -1146,12 +1147,14 @@ function MatchesPanel() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <Button className="btn-luxury" onClick={() => setWizard(true)}><Plus className="h-4 w-4 mr-1" />New Match (Wizard)</Button>
+        <Button className="btn-luxury" onClick={() => setShooterWizard(true)}><Plus className="h-4 w-4 mr-1" />New Shooter Match</Button>
         <Button variant="destructive" onClick={clearEnded}>
           <Trash2 className="h-4 w-4 mr-1" />Clear Ended Matches
         </Button>
         <Badge variant="outline" className="ml-auto text-[10px]">Bet history is preserved — only the panel list is cleared.</Badge>
       </div>
       {wizard && <MatchWizard onClose={() => { setWizard(false); load(); }} />}
+      {shooterWizard && <ShooterMatchWizard onClose={() => { setShooterWizard(false); load(); }} />}
 
       <div className="space-y-2">
         {matches.map((m: any) => (
