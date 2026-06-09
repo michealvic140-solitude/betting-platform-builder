@@ -1,1 +1,0 @@
-ALTER TABLE public.app_settings ADD COLUMN IF NOT EXISTS max_payout bigint NOT NULL DEFAULT 100000000;

@@ -1,1 +1,0 @@
-ALTER TABLE public.bets DROP CONSTRAINT IF EXISTS bets_potential_payout_check;

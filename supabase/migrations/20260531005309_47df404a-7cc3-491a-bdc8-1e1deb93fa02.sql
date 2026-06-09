@@ -1,1 +1,0 @@
-ALTER TABLE public.leaderboard_overrides ADD COLUMN IF NOT EXISTS is_hidden boolean NOT NULL DEFAULT false;
