@@ -2605,25 +2605,8 @@ function AnalyticsPanel() {
         </PanelBlock>
       </div>
 
-      {/* ROW 8 — Event Countdown | Broadcast Center | Quick Actions */}
+      {/* ROW 8 — Broadcast Center | Quick Actions | Top Bets */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
-        <PanelBlock title="EVENT COUNTDOWN" compact onView={() => setActiveTabFromAnalytics(nav, "events")}>
-          {event ? (
-            <button onClick={() => setActiveTabFromAnalytics(nav, "events")} className="relative w-full text-left rounded p-1 transition space-y-1 overflow-hidden">
-              {event.banner_url && (
-                <>
-                  <img src={event.banner_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-70 rounded" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-background/40 to-background/20 rounded" />
-                </>
-              )}
-              <div className="relative text-[9px] sm:text-xs font-bold text-primary truncate drop-shadow">{event.title}</div>
-              <div className="relative text-[10px] sm:text-sm font-mono text-amber-300 drop-shadow"><Countdown target={event.ends_at ?? event.starts_at} /></div>
-              <div className="relative text-[7px] sm:text-[9px] text-muted-foreground tabular-nums">{(() => { const d = new Date(event.starts_at ?? event.ends_at); const p = (n: number) => String(n).padStart(2, "0"); return `${d.getFullYear()}:${p(d.getMonth()+1)}:${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; })()}</div>
-            </button>
-          ) : (
-            <div className="text-[10px] text-muted-foreground">No active event</div>
-          )}
-        </PanelBlock>
         <PanelBlock title="BROADCAST CENTER" compact onView={() => setActiveTabFromAnalytics(nav, "broadcast")}>
           {broadcasts.length === 0 && <div className="text-[10px] text-muted-foreground">No broadcasts</div>}
           {broadcasts.map((b) => (
