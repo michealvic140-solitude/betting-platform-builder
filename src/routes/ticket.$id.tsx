@@ -32,6 +32,7 @@ function TicketPage() {
     const ch = supabase.channel(`item-${id}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "bets", filter: `id=eq.${id}` }, loadBet)
       .on("postgres_changes", { event: "*", schema: "public", table: "matches" }, loadBet)
+      .on("postgres_changes", { event: "*", schema: "public", table: "odds" }, loadBet)
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "support_tickets", filter: `id=eq.${id}` },
         (p) => setTicket(p.new))
       .on("postgres_changes", { event: "DELETE", schema: "public", table: "support_tickets", filter: `id=eq.${id}` },
