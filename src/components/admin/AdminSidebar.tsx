@@ -61,6 +61,7 @@ const NAV: AdminNavItem[] = [
   { key: "tokens",      label: "Tokens",               icon: Coins,           admin: true, alertKey: "tokens" },
   { key: "tokenrules",  label: "Token Rules",          icon: Coins,           admin: true },
   { key: "topbets",     label: "Top Bets",             icon: Flame,           modOk: true },
+  { key: "tournaments", label: "Tournaments",          icon: Trophy,          admin: true },
   { key: "users",       label: "Users",                icon: Users,           modOk: true, alertKey: "users" },
   { key: "virtual",     label: "Virtual",              icon: Dice5,           admin: true },
   { key: "vip",         label: "VIP",                  icon: Trophy,          admin: true },

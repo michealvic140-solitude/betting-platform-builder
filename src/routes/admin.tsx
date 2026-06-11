@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Card } from "@/components/ui/card";
@@ -45,6 +46,8 @@ import { SpotlightsAdminPanel } from "@/components/Spotlight";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { ClansAdminPanel } from "@/components/admin/ClansAdminPanel";
 import { TopBetsPanel } from "@/components/admin/TopBetsPanel";
+import { TournamentAdminPanel } from "@/components/admin/TournamentAdminPanel";
+import { seedLegacyUsers } from "@/lib/seed-users.functions";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export const Route = createFileRoute("/admin")({
@@ -193,6 +196,7 @@ function AdminPage() {
             <TabsContent value="spotlights" className="mt-4"><SpotlightsAdminPanel /></TabsContent>
             <TabsContent value="clans" className="mt-4"><ClansAdminPanel /></TabsContent>
             <TabsContent value="topbets" className="mt-4"><TopBetsPanel /></TabsContent>
+            <TabsContent value="tournaments" className="mt-4"><TournamentAdminPanel /></TabsContent>
           </Tabs>
         </div>
       </main>
@@ -334,6 +338,9 @@ function Stats() {
 
 /* ============================ USERS ============================ */
 function UsersPanel() {
+  const confirm = useConfirm();
+  const runSeed = useServerFn(seedLegacyUsers);
+  const [seeding, setSeeding] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
   const [rolesByUser, setRolesByUser] = useState<Record<string, string[]>>({});
   const [kycByUser, setKycByUser] = useState<Record<string, boolean>>({});
@@ -363,6 +370,20 @@ function UsersPanel() {
     setRolesByUser(m);
   }
   useEffect(() => { load(); }, []);
+
+  async function restoreLegacy() {
+    const ok = await confirm({ title: "Restore legacy member accounts?", description: "Recreates the imported members' login accounts (email-confirmed) and restores their profile data so they can use 'forgot password' to regain access. Existing accounts are left untouched.", confirmText: "Restore accounts" });
+    if (!ok) return;
+    setSeeding(true);
+    try {
+      const res: any = await runSeed();
+      toast.success(`Done — ${res.created} created, ${res.restored} profiles restored, ${res.skipped} already existed`);
+      if (res.errors?.length) toast.error(`Some rows had issues: ${res.errors[0]}`);
+      load();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Seeding failed");
+    } finally { setSeeding(false); }
+  }
 
   const filtered = useMemo(() => {
     let out = users.filter((u) => !q || u.full_name?.toLowerCase().includes(q.toLowerCase()) || u.email?.toLowerCase().includes(q.toLowerCase()) || u.gang_name?.toLowerCase().includes(q.toLowerCase()));
@@ -403,6 +424,9 @@ function UsersPanel() {
               <div className="text-[10px] uppercase tracking-[0.32em] text-primary/80">Member Registry</div>
               <div className="text-xl font-display admin-user-foil">Users Panel</div>
             </div>
+            <Button size="sm" variant="outline" className="ml-2" disabled={seeding} onClick={restoreLegacy}>
+              {seeding ? "Restoring…" : "Restore Legacy Accounts"}
+            </Button>
           </div>
           <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
             {[
@@ -1207,7 +1231,9 @@ async function settleBetsForMatch(matchId: string, winnerTeamId: string | null, 
       const norm = (v: string) => v.replace(/[^0-9]/g, "-").replace(/-+/g, "-");
       result = norm(oddLabel) === norm(scoreLabel) ? "won" : "lost";
     } else {
-      result = oddLabel === winnerLabel ? "won" : "lost";
+      // Tolerant match: ignore case + surrounding whitespace so labels still settle.
+      const norm = (v: string) => (v ?? "").trim().toLowerCase();
+      result = winnerLabel != null && norm(oddLabel) === norm(winnerLabel) ? "won" : "lost";
     }
     await supabase.from("bet_selections").update({ result }).eq("id", s.id);
   }
@@ -1341,6 +1367,7 @@ function ShooterSelect({ label, value, players, onChange }: { label: string; val
 }
 
 function FuturesAdminPanel() {
+  const confirm = useConfirm();
   const [settings, setSettings] = useState({ futures_section_title: "TOURNAMENT FUTURES", futures_min_stake: 1, futures_max_payout: 100000000, futures_max_selections: 1 });
   const [futures, setFutures] = useState<any[]>([]);
   const [teams, setTeams] = useState<any[]>([]);
@@ -1445,7 +1472,7 @@ function FuturesAdminPanel() {
   async function finalizeFuture(match: any) {
     const winners = (match.markets ?? []).flatMap((m: any) => m.odds ?? []).filter((o: any) => o.future_status === "winner" || o.is_winner);
     if (winners.length === 0) { toast.error("Mark at least one winner first"); return; }
-    if (!confirm(`Settle ${match.name} with ${winners.length} winner(s)?`)) return;
+    if (!await confirm({ title: `Settle ${match.name}?`, description: `This finalises the futures market with ${winners.length} winner(s): ${winners.map((o: any) => o.label).join(", ")}. Winning tickets are paid out and the market closes.`, confirmText: "Settle futures" })) return;
     await supabase.from("odds").update({ is_winner: false, future_status: "settled" } as any).in("market_id", (match.markets ?? []).map((m: any) => m.id));
     await supabase.from("odds").update({ is_winner: true, future_status: "winner" } as any).in("id", winners.map((o: any) => o.id));
     await supabase.from("markets").update({ is_open: false }).eq("match_id", match.id);
@@ -1456,7 +1483,7 @@ function FuturesAdminPanel() {
     load();
   }
   async function archiveFuture(id: string) {
-    if (!confirm("Archive this futures market?")) return;
+    if (!await confirm({ title: "Archive this futures market?", description: "It will be hidden from the homepage and admin list. Existing tickets keep their records.", tone: "danger", confirmText: "Archive" })) return;
     await supabase.from("matches").update({ is_archived: true }).eq("id", id);
     load();
   }

@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, Shield, Users, UserCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Team = { id: string; name: string; logo_url: string | null; gang_type: "G" | "F" | null };
 type Player = { id: string; team_id: string | null; name: string; position: string | null; avatar_url: string | null; is_substitute: boolean | null };
@@ -40,6 +41,7 @@ export function ClansAdminPanel() {
 }
 
 function GangsTab() {
+  const confirm = useConfirm();
   const [gangs, setGangs] = useState<Gang[]>([]);
   async function load() {
     const { data } = await supabase.from("profiles").select("gang_name, gang_type").not("gang_name", "is", null);
@@ -55,7 +57,7 @@ function GangsTab() {
   }
   useEffect(() => { load(); }, []);
   async function removeGang(name: string) {
-    if (!confirm(`Delete ${name} from all member profiles?`)) return;
+    if (!await confirm({ title: `Disband ${name}?`, description: `The gang / faction tag "${name}" will be removed from every member profile. Members keep their accounts and tokens.`, tone: "danger", confirmText: "Disband gang" })) return;
     const { error } = await supabase.from("profiles").update({ gang_name: null, gang_type: null } as any).eq("gang_name", name);
     if (error) return toast.error(error.message);
     toast.success("Gang / faction removed");
@@ -83,6 +85,7 @@ function GangsTab() {
 }
 
 function TeamsTab() {
+  const confirm = useConfirm();
   const [teams, setTeams] = useState<Team[]>([]);
   const [edit, setEdit] = useState<Partial<Team> | null>(null);
   async function load() {
@@ -102,7 +105,7 @@ function TeamsTab() {
     setEdit(null); toast.success("Saved"); load();
   }
   async function remove(id: string) {
-    if (!confirm("Delete this team?")) return;
+    if (!await confirm({ title: "Delete this team?", description: "The team / gang entry will be removed. Matches that already used it keep their stored team info.", tone: "danger", confirmText: "Delete team" })) return;
     const { error } = await supabase.from("teams").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Deleted"); load();
@@ -156,6 +159,7 @@ function TeamsTab() {
 }
 
 function PlayersTab() {
+  const confirm = useConfirm();
   const [players, setPlayers] = useState<Player[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [edit, setEdit] = useState<Partial<Player> | null>(null);
@@ -181,7 +185,7 @@ function PlayersTab() {
     setEdit(null); toast.success("Saved"); load();
   }
   async function remove(id: string) {
-    if (!confirm("Delete this player?")) return;
+    if (!await confirm({ title: "Delete this player?", description: "The shooter will be removed from the roster. Leaderboard history already recorded is kept.", tone: "danger", confirmText: "Delete player" })) return;
     const { error } = await supabase.from("players").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Deleted"); load();
