@@ -1443,7 +1443,9 @@ function FuturesAdminPanel() {
       at: opts.at ? new Date(opts.at).toISOString() : new Date().toISOString(),
     };
     progress.push(entry);
-    const advanced = status === "qualified";
+    // A "lost" round no longer eliminates the contender — they advance to the next round
+    // and the loss is shown on the bet voucher progress. Only "disqualified" removes them.
+    const advanced = status === "qualified" || status === "lost";
     const { error } = await supabase.from("odds").update({
       future_status: status,
       // After qualifying a round, the contender automatically moves to the next round.
@@ -1453,12 +1455,14 @@ function FuturesAdminPanel() {
       is_winner: status === "winner" ? true : odd.is_winner,
     } as any).eq("id", odd.id);
     if (error) { toast.error(error.message); return; }
-    if (["lost", "disqualified"].includes(status)) await loseFutureSelection(odd);
+    // Only a disqualification settles open tickets as lost. A "lost" round keeps tickets open.
+    if (status === "disqualified") await loseFutureSelection(odd);
     await logAudit("future_status_changed", "odd", odd.id, { label: odd.label, status, round, score: entry.score, opponent: entry.opponent });
     toast.success(
       status === "qualified" ? `${odd.label} qualified — advanced to Round ${round + 1}`
         : status === "winner" ? `${odd.label} crowned WINNER`
-        : `${odd.label} ${status} and removed from the event`,
+        : status === "lost" ? `${odd.label} lost Round ${round} — still in, advanced to Round ${round + 1}`
+        : `${odd.label} disqualified and removed from the event`,
     );
     load();
   }
