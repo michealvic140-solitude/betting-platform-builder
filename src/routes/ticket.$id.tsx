@@ -358,7 +358,8 @@ function FutureTicketProgress({ odd }: { odd: any }) {
   const progress = Array.isArray(odd?.future_progress) ? odd.future_progress : [];
   const status = odd?.future_status ?? "active";
   const steps = progress.length ? progress : [{ status, title: odd?.future_next_title || "Tournament active", at: odd?.future_next_at }];
-  const headline = ["winner", "lost", "disqualified", "settled"].includes(status)
+  // A "lost" round does NOT end the run — the contender advanced, so show the next round.
+  const headline = ["winner", "disqualified", "settled"].includes(status)
     ? status
     : odd?.future_next_title || "In progress";
   return (
