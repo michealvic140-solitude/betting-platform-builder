@@ -2258,6 +2258,10 @@ function HighlightsPanel() {
           <Card key={h.id} className="glass p-2">
             {h.media_type === "video" ? <video src={h.media_url} className="w-full h-32 object-cover rounded" controls /> : <img src={h.media_url} className="w-full h-32 object-cover rounded" alt="" />}
             <div className="font-bold text-sm mt-1 truncate">{h.title}</div>
+            <div className="flex items-center gap-3 mt-1 text-xs">
+              <span className="flex items-center gap-1 text-emerald-300"><ThumbsUp className="h-3.5 w-3.5" />{h.likes ?? 0}</span>
+              <span className="flex items-center gap-1 text-destructive"><ThumbsDown className="h-3.5 w-3.5" />{h.dislikes ?? 0}</span>
+            </div>
             <div className="flex gap-1 mt-1">
               <Button size="sm" variant="outline" onClick={() => toggle(h.id, !h.is_active)}>{h.is_active ? "Hide" : "Show"}</Button>
               <Button size="sm" variant="destructive" onClick={() => del(h.id)}><Trash2 className="h-3 w-3" /></Button>
