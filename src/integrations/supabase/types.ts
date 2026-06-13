@@ -75,6 +75,8 @@ export type Database = {
           admin_ai_model: string
           allow_rebet: boolean
           challenge_reward_multiplier: number
+          closed_message: string
+          closed_mode: boolean
           contact_email: string | null
           contact_phone: string | null
           contact_whatsapp: string | null
@@ -155,6 +157,8 @@ export type Database = {
           admin_ai_model?: string
           allow_rebet?: boolean
           challenge_reward_multiplier?: number
+          closed_message?: string
+          closed_mode?: boolean
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
@@ -235,6 +239,8 @@ export type Database = {
           admin_ai_model?: string
           allow_rebet?: boolean
           challenge_reward_multiplier?: number
+          closed_message?: string
+          closed_mode?: boolean
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
