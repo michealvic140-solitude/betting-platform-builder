@@ -104,12 +104,11 @@ function Board({
   emptyText: string;
 }) {
   return (
-    <div className="relative rounded-2xl overflow-hidden border border-emerald-400/20 bg-gradient-to-b from-emerald-950/40 to-black/50 backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_40px_-12px_rgba(0,0,0,0.9)]">
-      <img src={lslLogo} alt="" aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] max-w-md opacity-[0.06]" />
+    <div className="relative rounded-2xl overflow-hidden glass-ice border border-primary/20">
       <div className="relative overflow-x-auto">
         <table className="w-full text-sm min-w-[640px]">
           <thead>
-            <tr className="text-left text-[11px] uppercase tracking-widest text-amber-200/70 border-b border-amber-400/20 bg-black/30">
+            <tr className="text-left text-[11px] uppercase tracking-widest text-amber-200/80 border-b border-amber-400/25 bg-white/5">
               <Th>Rank</Th><Th>{firstCol}</Th><Th>{secondCol}</Th>
               <Th right>TS</Th><Th right>W</Th><Th right>L</Th><Th right>D</Th><Th right>P</Th><Th right>PTS</Th>
             </tr>
@@ -117,7 +116,7 @@ function Board({
           <tbody>
             {rows.length === 0 && <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">{emptyText}</td></tr>}
             {rows.map((r, i) => (
-              <tr key={r.name} className="border-b border-white/5 hover:bg-amber-400/5 transition-colors">
+              <tr key={r.name} className="glass-ice-row border-b border-white/5 hover:bg-amber-400/10 transition-colors">
                 <Td><Medal i={i} /></Td>
                 <Td>{firstPick ? <span className="font-bold text-primary/90">{firstPick(r)}</span> : <span className="font-bold">{pick(r)}</span>}</Td>
                 <Td><span className={firstPick ? "font-bold" : "text-muted-foreground"}>{firstPick ? pick(r) : (r.top_player || "—")}</span></Td>
