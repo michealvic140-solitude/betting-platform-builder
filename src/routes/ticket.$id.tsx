@@ -68,7 +68,20 @@ function BetTicket({ bet, viewerId }: { bet: any; viewerId: string }) {
     : bet.status === "cashed_out" ? { label: "CASHED OUT", cls: "border border-amber-400/40 text-amber-300 bg-amber-400/10", Icon: ShieldCheck }
     : { label: "PENDING", cls: "neon-green-border text-emerald-300 bg-emerald-500/10", Icon: ClockIcon };
 
-  const allWon = sels.length > 0 && sels.every((s: any) => s.result === "won");
+  // A selection counts as "winning so far" while a match/tournament is still running.
+  function provWin(s: any): boolean {
+    if (s.result === "won") return true;
+    if (s.result === "lost") return false;
+    const m = s.matches;
+    if (m?.match_kind === "future") return ["qualified", "winner"].includes(s.odds?.future_status);
+    if (!m || (m.status !== "live" && m.status !== "ended")) return false;
+    if (s.markets?.name === "Correct Score") return s.selection_label === `${m.home_score}-${m.away_score}`;
+    const lead = m.home_score > m.away_score ? m.home_team?.name : m.away_score > m.home_score ? m.away_team?.name : "Draw";
+    return s.selection_label === lead;
+  }
+  const allWinning = sels.length > 0 && sels.every(provWin);
+  const isFullWin = sels.length > 0 && sels.every((s: any) => s.result === "won");
+  const cashoutValue = isFullWin ? Number(bet.potential_payout) : Math.floor(Number(bet.potential_payout) * 0.8);
   function copy(t: string) { navigator.clipboard.writeText(t); toast.success("Copied"); }
 
   async function shareCode() {
