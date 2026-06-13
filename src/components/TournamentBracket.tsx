@@ -117,7 +117,7 @@ export function TournamentBracket({
         </div>
 
         {/* ---------- ROUND HEADERS ---------- */}
-        <div className="absolute" style={{ top: HEADER_H - 8, left: 0, right: 0, height: 44 }}>
+        <div className="absolute" style={{ top: HEADER_H - 50, left: 0, right: 0, height: 44 }}>
           {rounds.map((rms, ri) => {
             const lbl = roundLabel(rms.length * 2);
             const RIcon = roundIcon(rms.length * 2);
@@ -141,7 +141,7 @@ export function TournamentBracket({
         </div>
 
         {/* ---------- BRACKET ---------- */}
-        <div className="absolute" style={{ top: HEADER_H, left: 0, width: canvasW, height: bracketH }}>
+        <div className="absolute" style={{ top: HEADER_H + 26, left: 0, width: canvasW, height: bracketH }}>
           {/* connectors */}
           <svg className="absolute inset-0" width={canvasW} height={bracketH} style={{ pointerEvents: "none" }}>
             {rounds.map((rms, ri) =>
