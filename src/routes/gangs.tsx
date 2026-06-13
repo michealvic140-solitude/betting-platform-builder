@@ -8,7 +8,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { teamColor } from "@/lib/queries";
 
 export const Route = createFileRoute("/gangs")({
-  head: () => ({ meta: [{ title: "Gangs — LSL" }, { name: "description", content: "Factions of the Lomita Shooters League." }] }),
+  head: () => ({
+    meta: [
+      { title: "Gangs — LSL" },
+      { name: "description", content: "Explore the gangs and factions of the Lomita Shooters League, ranked by tokens and members." },
+    ],
+  }),
   component: GangsPage,
 });
 
