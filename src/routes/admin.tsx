@@ -3076,6 +3076,9 @@ function AnalyticsPanel() {
           ))}
         </div>
       </Card>
+
+      {/* Quick actions moved to the bottom — 4 buttons per column, scrolls horizontally */}
+      <QuickActionsBar onOpen={(t) => setActiveTabFromAnalytics(nav, t)} />
     </div>
   );
 }
@@ -3084,6 +3087,118 @@ function setActiveTabFromAnalytics(_nav: any, _tab: string) {
   // Dispatch a custom event the parent listens to, or fallback: store and reload
   const ev = new CustomEvent("admin:set-tab", { detail: _tab });
   window.dispatchEvent(ev);
+}
+
+const QUICK_ACTIONS: { i: any; l: string; t: string }[] = [
+  { i: BarChart3, l: "Analytics", t: "analytics" },
+  { i: Users, l: "Users", t: "users" },
+  { i: Shield, l: "Banned", t: "bannedusers" },
+  { i: Sparkles, l: "Admin AI", t: "adminai" },
+  { i: AlertTriangle, l: "Appeals", t: "appeals" },
+  { i: History, l: "Audit", t: "audit" },
+  { i: ClipboardList, l: "Bet Tracker", t: "bettracker" },
+  { i: Send, l: "Broadcast", t: "broadcast" },
+  { i: Sparkles, l: "Challenges", t: "challenges" },
+  { i: MessageSquare, l: "Chat", t: "chat" },
+  { i: Megaphone, l: "Content", t: "content" },
+  { i: Target, l: "Futures", t: "futures" },
+  { i: Trophy, l: "Emblems", t: "emblems" },
+  { i: Calendar, l: "Events", t: "events" },
+  { i: Wallet, l: "House Wallet", t: "housewallet" },
+  { i: ListOrdered, l: "Leaderboard", t: "leaderboard" },
+  { i: Trophy, l: "Matches", t: "matches" },
+  { i: Send, l: "Notify", t: "notify" },
+  { i: BarChart3, l: "P&L", t: "pnl" },
+  { i: Tag, l: "Promo Codes", t: "promos" },
+  { i: Tag, l: "Promo Reqs", t: "promoreqs" },
+  { i: Users, l: "Referrals", t: "referrals" },
+  { i: BarChart3, l: "Reports", t: "reports" },
+  { i: AlertTriangle, l: "Risk", t: "risk" },
+  { i: Trophy, l: "Seasons", t: "seasons" },
+  { i: Trophy, l: "Tournaments", t: "tournaments" },
+  { i: SettingsIcon, l: "Settings", t: "settings" },
+  { i: Sparkles, l: "Spotlights", t: "spotlights" },
+  { i: Sparkles, l: "Streak/Push", t: "streakpush" },
+  { i: ClipboardList, l: "Tasks", t: "tasks" },
+  { i: Ticket, l: "Tickets", t: "tickets" },
+  { i: Coins, l: "Tokens", t: "tokens" },
+  { i: Coins, l: "Token Rules", t: "tokenrules" },
+  { i: Coins, l: "Token Move", t: "tokenmovement" },
+  { i: Users, l: "Activity", t: "activity" },
+  { i: Dice5, l: "Virtual", t: "virtual" },
+  { i: Trophy, l: "VIP", t: "vip" },
+  { i: Wallet, l: "Withdrawals", t: "withdrawals" },
+  { i: Trophy, l: "Won Bets", t: "wonbets" },
+  { i: X, l: "Lost Bets", t: "lostbets" },
+];
+
+const QA_PALETTE = [
+  { ic: "text-emerald-400", bd: "border-emerald-500/30 hover:border-emerald-400/70 hover:bg-emerald-500/10" },
+  { ic: "text-sky-400",     bd: "border-sky-500/30 hover:border-sky-400/70 hover:bg-sky-500/10" },
+  { ic: "text-rose-400",    bd: "border-rose-500/30 hover:border-rose-400/70 hover:bg-rose-500/10" },
+  { ic: "text-amber-400",   bd: "border-amber-500/30 hover:border-amber-400/70 hover:bg-amber-500/10" },
+  { ic: "text-violet-400",  bd: "border-violet-500/30 hover:border-violet-400/70 hover:bg-violet-500/10" },
+  { ic: "text-fuchsia-400", bd: "border-fuchsia-500/30 hover:border-fuchsia-400/70 hover:bg-fuchsia-500/10" },
+  { ic: "text-cyan-400",    bd: "border-cyan-500/30 hover:border-cyan-400/70 hover:bg-cyan-500/10" },
+  { ic: "text-lime-400",    bd: "border-lime-500/30 hover:border-lime-400/70 hover:bg-lime-500/10" },
+  { ic: "text-orange-400",  bd: "border-orange-500/30 hover:border-orange-400/70 hover:bg-orange-500/10" },
+  { ic: "text-pink-400",    bd: "border-pink-500/30 hover:border-pink-400/70 hover:bg-pink-500/10" },
+  { ic: "text-teal-400",    bd: "border-teal-500/30 hover:border-teal-400/70 hover:bg-teal-500/10" },
+  { ic: "text-indigo-400",  bd: "border-indigo-500/30 hover:border-indigo-400/70 hover:bg-indigo-500/10" },
+];
+
+function QuickActionsBar({ onOpen }: { onOpen: (t: string) => void }) {
+  return (
+    <Card className="border-primary/20 bg-card/60 p-3">
+      <div className="text-[10px] sm:text-xs font-bold tracking-widest text-primary mb-2">QUICK ACTIONS</div>
+      <div className="overflow-x-auto pb-2 -mb-2">
+        {/* 4 buttons stacked per column; columns flow horizontally and scroll left/right */}
+        <div className="grid grid-rows-4 grid-flow-col auto-cols-[68px] sm:auto-cols-[84px] gap-1.5 w-max">
+          {QUICK_ACTIONS.map((q, idx) => {
+            const c = QA_PALETTE[idx % QA_PALETTE.length];
+            return (
+              <button key={q.l} onClick={() => onOpen(q.t)} className={`flex flex-col items-center justify-center gap-1 p-1.5 rounded border active:scale-95 transition ${c.bd}`}>
+                <q.i className={`h-3.5 w-3.5 ${c.ic}`} />
+                <span className="text-[7px] sm:text-[9px] text-foreground text-center leading-tight">{q.l}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function MiniLeaderboardPanel({ onOpen }: { onOpen: () => void }) {
+  const [gangs, setGangs] = useState<LbRow[]>([]);
+  const [shooters, setShooters] = useState<LbRow[]>([]);
+  const [tab, setTab] = useState<"gangs" | "shooters">("gangs");
+  useEffect(() => {
+    loadStandings().then(({ gangs, shooters }) => { setGangs(gangs); setShooters(shooters); }).catch(() => {});
+  }, []);
+  const rows = (tab === "gangs" ? gangs : shooters).slice(0, 6);
+  return (
+    <Card className="bg-card/60 p-2 sm:p-3 flex flex-col min-h-0 max-h-[170px] border-amber-500/30 shadow-[0_0_30px_-12px_rgba(251,191,36,0.5)]">
+      <div className="flex items-center justify-between mb-1.5">
+        <div className="text-[8px] sm:text-[11px] font-bold tracking-widest text-amber-300 flex items-center gap-1"><Trophy className="h-3 w-3" />LEADERBOARD</div>
+        <button onClick={onOpen} className="text-[7px] sm:text-[9px] text-amber-300/80 hover:text-amber-200">Open</button>
+      </div>
+      <div className="flex gap-1 mb-1">
+        <button onClick={() => setTab("gangs")} className={`flex-1 text-[7px] sm:text-[9px] rounded px-1 py-0.5 border ${tab === "gangs" ? "border-amber-400/60 bg-amber-400/10 text-amber-200" : "border-border/40 text-muted-foreground"}`}>Gangs</button>
+        <button onClick={() => setTab("shooters")} className={`flex-1 text-[7px] sm:text-[9px] rounded px-1 py-0.5 border ${tab === "shooters" ? "border-amber-400/60 bg-amber-400/10 text-amber-200" : "border-border/40 text-muted-foreground"}`}>Shooters</button>
+      </div>
+      <button onClick={onOpen} className="flex-1 overflow-y-auto pr-0.5 text-left">
+        {rows.length === 0 && <div className="text-[9px] text-muted-foreground py-2">No data yet</div>}
+        {rows.map((r, i) => (
+          <div key={r.name} className="flex items-center gap-1.5 text-[8px] sm:text-[10px] py-0.5 border-b border-border/30 last:border-0">
+            <span className={`w-3.5 text-center font-black tabular-nums ${i < 3 ? "text-amber-300" : "text-muted-foreground"}`}>{i + 1}</span>
+            <span className="flex-1 min-w-0 truncate text-foreground font-semibold">{tab === "shooters" ? r.name : r.name}</span>
+            <span className="text-emerald-400 font-bold tabular-nums">{r.PTS}</span>
+          </div>
+        ))}
+      </button>
+    </Card>
+  );
 }
 
 function MetricSquare({ icon: Icon, value, title, sub, tone, compact, onClick }: { icon: any; value: any; title: string; sub?: string; tone?: string; compact?: boolean; onClick?: () => void }) {
