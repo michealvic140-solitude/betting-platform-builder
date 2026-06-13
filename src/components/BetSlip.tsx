@@ -279,7 +279,7 @@ function BetSlipDrawer({ open, onClose }: { open: boolean; onClose: () => void }
   );
 }
 
-function PlacedPreview({ bet, onView, onClose }: { bet: any; onView: () => void; onClose: () => void }) {
+function PlacedPreview({ bet, onView, onClose, allowAgain, onAgain }: { bet: any; onView: () => void; onClose: () => void; allowAgain?: boolean; onAgain?: () => void }) {
   const sels = bet._selections ?? [];
   function copy(t: string) { navigator.clipboard.writeText(t); toast.success("Copied"); }
   async function share() {
@@ -329,6 +329,11 @@ function PlacedPreview({ bet, onView, onClose }: { bet: any; onView: () => void;
         <Button variant="outline" onClick={share}><Share2 className="h-4 w-4 mr-1" />Share</Button>
         <Button className="btn-luxury" onClick={onView}><ExternalLink className="h-4 w-4 mr-1" />View Ticket</Button>
       </div>
+      {allowAgain && onAgain && (
+        <Button className="w-full btn-luxury" onClick={onAgain}>
+          <Ticket className="h-4 w-4 mr-1" />Place another bet
+        </Button>
+      )}
       <Button variant="ghost" className="w-full" onClick={onClose}>Close</Button>
     </div>
   );
