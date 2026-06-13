@@ -1456,6 +1456,18 @@ function FuturesAdminPanel() {
     setLinkableMatches(lm ?? []);
   }
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    const refresh = () => load();
+    window.addEventListener("admin:futures-refresh", refresh);
+    const ch = supabase.channel("admin-futures-linked-score-refresh")
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "odds" }, refresh)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "matches" }, refresh)
+      .subscribe();
+    return () => {
+      window.removeEventListener("admin:futures-refresh", refresh);
+      supabase.removeChannel(ch);
+    };
+  }, []);
 
   async function ensureFutureTeams() {
     const { data } = await supabase.from("teams").select("id,name").in("name", ["LSL Futures", "Season Field"]);
