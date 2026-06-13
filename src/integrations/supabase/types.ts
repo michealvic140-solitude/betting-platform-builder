@@ -833,27 +833,65 @@ export type Database = {
         }
         Relationships: []
       }
+      highlight_reactions: {
+        Row: {
+          created_at: string
+          highlight_id: string
+          id: string
+          reaction: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          highlight_id: string
+          id?: string
+          reaction: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          highlight_id?: string
+          id?: string
+          reaction?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "highlight_reactions_highlight_id_fkey"
+            columns: ["highlight_id"]
+            isOneToOne: false
+            referencedRelation: "highlights"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       highlights: {
         Row: {
           created_at: string
+          dislikes: number
           id: string
           is_active: boolean
+          likes: number
           media_type: string
           media_url: string
           title: string
         }
         Insert: {
           created_at?: string
+          dislikes?: number
           id?: string
           is_active?: boolean
+          likes?: number
           media_type?: string
           media_url: string
           title: string
         }
         Update: {
           created_at?: string
+          dislikes?: number
           id?: string
           is_active?: boolean
+          likes?: number
           media_type?: string
           media_url?: string
           title?: string
