@@ -17,6 +17,7 @@ type Hot = {
   users_count: number;
   bets_count: number;
   total_stake: number;
+  last_bet_at?: string | null;
 };
 
 type MatchStatusInfo = { status: string; is_virtual: boolean };
