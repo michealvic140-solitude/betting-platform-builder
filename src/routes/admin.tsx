@@ -3401,6 +3401,8 @@ function LeaderboardAdminPanel() {
   const [tab, setTab] = useState<"gang" | "shooter">("gang");
   const [edits, setEdits] = useState<Record<string, Partial<LbRow>>>({});
   const [savingKey, setSavingKey] = useState<string | null>(null);
+  const [headerUrl, setHeaderUrl] = useState<string>("");
+  const [headerBusy, setHeaderBusy] = useState(false);
   const confirm = useConfirm();
 
   async function load() {
@@ -3409,7 +3411,31 @@ function LeaderboardAdminPanel() {
     setShooters(shooters);
     setEdits({});
   }
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    supabase.from("app_settings").select("leaderboard_header_url").eq("id", 1).maybeSingle()
+      .then(({ data }) => setHeaderUrl((data as any)?.leaderboard_header_url ?? ""));
+  }, []);
+
+  async function saveHeaderUrl(url: string) {
+    const { error } = await supabase.from("app_settings").update({ leaderboard_header_url: url || null } as any).eq("id", 1);
+    if (error) { toast.error(error.message); return; }
+    setHeaderUrl(url);
+    await logAudit("leaderboard_header_update", "app_settings", undefined, { url });
+    toast.success("Leaderboard header saved");
+  }
+  async function uploadHeader(file: File) {
+    setHeaderBusy(true);
+    try {
+      const path = `leaderboard/header-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`;
+      const { error } = await supabase.storage.from("ads").upload(path, file, { upsert: true });
+      if (error) { toast.error(error.message); return; }
+      const url = supabase.storage.from("ads").getPublicUrl(path).data.publicUrl;
+      await saveHeaderUrl(url);
+    } finally {
+      setHeaderBusy(false);
+    }
+  }
 
   const rows = tab === "gang" ? gangs : shooters;
   const rowKey = (r: LbRow) => `${tab}:${r.name}`;
