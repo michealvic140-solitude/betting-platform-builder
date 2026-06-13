@@ -120,15 +120,22 @@ export function TournamentBracket({
         <div className="absolute" style={{ top: HEADER_H - 8, left: 0, right: 0, height: 44 }}>
           {rounds.map((rms, ri) => {
             const lbl = roundLabel(rms.length * 2);
+            const RIcon = roundIcon(rms.length * 2);
             return (
               <div key={ri} className="absolute text-center" style={{ left: SIDE_PAD + ri * COL_W, width: COL_W }}>
-                <div className="text-[15px] font-black tracking-[0.12em] text-amber-300">{lbl.title}</div>
+                <div className="flex items-center justify-center gap-1.5">
+                  <RIcon className="h-4 w-4 text-emerald-400" />
+                  <span className="text-[15px] font-black tracking-[0.12em] text-amber-300">{lbl.title}</span>
+                </div>
                 <div className="text-[11px] font-bold tracking-[0.2em] text-amber-100/50">{lbl.sub}</div>
               </div>
             );
           })}
           <div className="absolute text-center" style={{ left: SIDE_PAD + rounds.length * COL_W, width: CHAMP_W }}>
-            <div className="text-[15px] font-black tracking-[0.12em] text-amber-300">CHAMPION</div>
+            <div className="flex items-center justify-center gap-1.5">
+              <Crown className="h-4 w-4 text-emerald-400" />
+              <span className="text-[15px] font-black tracking-[0.12em] text-amber-300">CHAMPION</span>
+            </div>
             <div className="text-[11px] font-bold tracking-[0.2em] text-amber-100/50">ONLY ONE KING</div>
           </div>
         </div>
