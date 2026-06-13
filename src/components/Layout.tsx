@@ -116,24 +116,24 @@ export const Layout = ({ children }: { children: ReactNode }) => {
           </div>
         )}
       </header>
-      <main className="relative lg:pl-0 pl-14">{children}</main>
+      <main className="relative lg:pl-0 pl-16 overflow-x-hidden">{children}</main>
       <LevelUpModal />
       <nav
-        className="lg:hidden fixed left-0 inset-y-0 pt-16 z-40 w-14 overflow-y-auto bg-transparent border-0 shadow-none"
+        className="lg:hidden fixed left-0 inset-y-0 pt-16 z-40 w-16 overflow-y-auto bg-transparent border-0 shadow-none"
       >
-        <div className="flex flex-col items-stretch gap-0.5 py-2 px-1">
+        <div className="flex flex-col items-stretch gap-2.5 py-3 px-1">
           <button
             type="button"
             onClick={() => setRailOpen((v) => !v)}
             aria-expanded={railOpen}
             aria-label={railOpen ? "Collapse menu" : "Expand menu"}
-            className="group relative flex flex-col items-center justify-center gap-0.5 px-0 py-2 rounded-xl text-[9px] font-semibold tracking-wide text-primary transition-all hover:text-foreground active:scale-95"
+            className="group relative flex flex-col items-center justify-center gap-1 px-0 py-1 rounded-xl text-[10px] font-semibold tracking-wide text-primary transition-all hover:text-foreground active:scale-95"
             title="Menu"
           >
-            <span className="relative grid place-items-center h-9 w-9 rounded-xl bg-gradient-to-br from-primary/25 to-primary/5 shadow-[0_0_18px_-4px_rgba(212,175,55,0.55)]">
-              <SettingsIcon className={`h-[18px] w-[18px] transition-transform ${railOpen ? "rotate-180" : ""}`} />
+            <span className="relative grid place-items-center h-11 w-11 rounded-xl bg-gradient-to-br from-primary/25 to-primary/5 shadow-[0_0_18px_-4px_rgba(212,175,55,0.55)]">
+              <SettingsIcon className={`h-[22px] w-[22px] transition-transform ${railOpen ? "rotate-180" : ""}`} />
             </span>
-            <span className="leading-none text-[8px]">{railOpen ? "Less" : "More"}</span>
+            <span className="leading-none text-[9px]">{railOpen ? "Less" : "More"}</span>
           </button>
           <MobLink to="/" icon={Home} label="Home" />
           {railOpen && <>
