@@ -229,14 +229,41 @@ export function TournamentAdminPanel() {
     setResultMatch(m);
     setSA(m.score_a != null ? String(m.score_a) : "");
     setSB(m.score_b != null ? String(m.score_b) : "");
+    setLinkId((m as any).match_id ?? "");
   }
-  async function submitResult(winnerId: string | null) {
+
+  // Link / unlink a real match to this bracket slot. Once linked, the DB trigger
+  // keeps score_a/score_b in sync with the live match's score automatically.
+  async function linkLiveMatch(matchId: string) {
+    if (!resultMatch) return;
+    setLinkId(matchId);
+    const { error } = await (supabase as any).from("tournament_matches").update({ match_id: matchId || null }).eq("id", resultMatch.id);
+    if (error) { toast.error(error.message); return; }
+    if (matchId) {
+      const lm = linkableMatches.find((x) => x.id === matchId);
+      if (lm) {
+        // pull current scores immediately so the admin can review them
+        await (supabase as any).from("tournament_matches").update({ score_a: lm.home_score ?? 0, score_b: lm.away_score ?? 0 }).eq("id", resultMatch.id);
+        setSA(String(lm.home_score ?? 0));
+        setSB(String(lm.away_score ?? 0));
+      }
+      toast.success("Linked — scores will auto-update from this match");
+    } else {
+      toast.success("Unlinked from live match");
+    }
+    setResultMatch({ ...resultMatch, match_id: matchId || null } as TMatch);
+    if (sel) loadDetail(sel.id);
+  }
+
+  async function submitResult(winnerId: string | null, outcome: string | null = null, dqId: string | null = null) {
     if (!resultMatch) return;
     const { error } = await (supabase as any).rpc("set_tournament_result", {
       _match_id: resultMatch.id,
       _score_a: sA === "" ? null : Number(sA),
       _score_b: sB === "" ? null : Number(sB),
       _winner_id: winnerId,
+      _outcome: outcome,
+      _dq_id: dqId,
     });
     if (error) { toast.error(error.message); return; }
     toast.success(winnerId ? "Result saved — winner advanced" : "Scores saved");
