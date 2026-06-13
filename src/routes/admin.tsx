@@ -31,7 +31,6 @@ const tileVirtualAsset = { url: tileVirtual };
 const tileChallengesAsset = { url: tileChallenges };
 const tileUsersAsset = { url: tileUsers };
 const tileClansAsset = { url: tileClans };
-import consoleHeaderBgAsset from "@/assets/console-header-bg.jpg.asset.json";
 import adminConsoleSeed from "@/assets/admin-console-seed.jpg";
 import leagueSkullFire from "@/assets/league-skull-fire.jpg";
 import { Countdown } from "@/components/Countdown";
