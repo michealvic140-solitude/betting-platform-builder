@@ -217,9 +217,9 @@ export function TournamentBracket({
               boxShadow: "0 0 40px -8px rgba(212,175,55,0.5)",
             }}
           >
-            <Trophy className="h-24 w-24 text-amber-300 drop-shadow-[0_0_20px_rgba(212,175,55,0.6)]" />
-            <div className="text-[22px] font-black tracking-[0.18em] gradient-gold-text mt-2">CHAMPION</div>
-            <div className="flex gap-1 text-amber-300 mt-1">★ ★ ★</div>
+            <ChampionTrophy />
+            <div className="text-[22px] font-black tracking-[0.18em] gradient-gold-text mt-3">CHAMPION</div>
+            <div className="flex gap-1.5 text-amber-300 mt-1 text-[18px] drop-shadow-[0_0_8px_rgba(212,175,55,0.7)]">★ ★ ★</div>
             <div className="text-[16px] font-bold text-amber-100 mt-2 px-2 text-center truncate max-w-full">
               {champion ? champion.name : "— TBD —"}
             </div>
