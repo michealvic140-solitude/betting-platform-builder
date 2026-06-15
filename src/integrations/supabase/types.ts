@@ -3169,7 +3169,14 @@ export type Database = {
         | "moderator"
         | "admin"
         | "sponsor"
-      bet_status: "open" | "won" | "lost" | "cashed_out" | "void" | "suspended"
+      bet_status:
+        | "open"
+        | "won"
+        | "lost"
+        | "cashed_out"
+        | "void"
+        | "suspended"
+        | "refunded"
       chat_room: "general" | "gang" | "moderator"
       gang_type: "G" | "F"
       match_status: "scheduled" | "live" | "ended" | "cancelled"
@@ -3312,7 +3319,15 @@ export const Constants = {
         "admin",
         "sponsor",
       ],
-      bet_status: ["open", "won", "lost", "cashed_out", "void", "suspended"],
+      bet_status: [
+        "open",
+        "won",
+        "lost",
+        "cashed_out",
+        "void",
+        "suspended",
+        "refunded",
+      ],
       chat_room: ["general", "gang", "moderator"],
       gang_type: ["G", "F"],
       match_status: ["scheduled", "live", "ended", "cancelled"],
