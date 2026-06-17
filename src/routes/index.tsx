@@ -92,6 +92,13 @@ function Index() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background" />
         <div className="container relative py-20 md:py-32">
+          {settings?.site_logo_url && (
+            <img
+              src={settings.site_logo_url}
+              alt={settings?.site_name || "Platform logo"}
+              className="mb-6 h-20 md:h-28 w-auto object-contain drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]"
+            />
+          )}
           <Badge variant="outline" className="border-primary/50 text-primary mb-4">
             <Flame className="h-3 w-3 mr-1" /> {tagline}
           </Badge>
