@@ -137,7 +137,7 @@ export function AdminPage() {
 
           <div
             className="admin-hero-frame relative overflow-hidden rounded-2xl p-5 sm:p-7"
-            style={{ backgroundImage: `linear-gradient(90deg, rgba(3,12,10,0.76) 0%, rgba(3,12,10,0.44) 42%, rgba(3,12,10,0.18) 100%), url(${heroBg || adminConsoleSeed})`, backgroundSize: "cover", backgroundPosition: "center right" }}
+            style={{ backgroundImage: `linear-gradient(90deg, rgba(3,12,10,0.76) 0%, rgba(3,12,10,0.44) 42%, rgba(3,12,10,0.18) 100%), url(${heroBg || adminConsoleSeed})`, backgroundSize: `auto, ${heroFit === "contain" ? "contain" : heroFit === "fill" ? "100% 100%" : "cover"}`, backgroundPosition: `center, ${heroPos || "center right"}`, backgroundRepeat: "no-repeat" }}
           >
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-gold" />
             <div className="relative flex items-center gap-3 flex-wrap">
