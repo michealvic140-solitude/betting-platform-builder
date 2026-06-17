@@ -51,12 +51,24 @@ export const Layout = ({ children }: { children: ReactNode }) => {
   useVirtualHeartbeat();
   useForceReloadBroadcast();
   const [railOpen, setRailOpen] = useState(false);
+  // Admin-configurable site-wide background (falls back to bundled nebula art).
+  const [siteBg, setSiteBg] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.from("app_settings").select("site_bg_url").eq("id", 1).maybeSingle()
+      .then(({ data }) => setSiteBg((data as any)?.site_bg_url ?? null));
+    const ch = supabase.channel("site-bg")
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "app_settings" }, (p: any) => {
+        setSiteBg(p.new?.site_bg_url ?? null);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
   return (
     <div className="relative min-h-screen">
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <img
-          src={lslPlatformBg.url}
+          src={siteBg || lslPlatformBg.url}
           alt=""
           aria-hidden
           className="absolute inset-0 h-full w-full object-cover"
