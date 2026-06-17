@@ -61,10 +61,16 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-function AdminPage() {
+export function AdminPage() {
   const { isAdmin, isMod, loading } = useAuth();
   const nav = useNavigate();
   const [alerts, setAlerts] = useState<Record<string, number>>({});
+  // Admin-configurable console header image (falls back to bundled seed art).
+  const [heroBg, setHeroBg] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.from("app_settings").select("admin_hero_url").eq("id", 1).maybeSingle()
+      .then(({ data }) => setHeroBg((data as any)?.admin_hero_url ?? null));
+  }, []);
   // Toggle the frosted-glass blur on the whole console so admins can verify
   // sensitive data alignment/layout against a clean, unblurred surface.
   const [unblurred, setUnblurred] = useState(false);
