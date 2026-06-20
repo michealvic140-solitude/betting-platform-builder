@@ -131,8 +131,8 @@ export function VipCard() {
   const meta = TIER_META[tier] ?? TIER_META.bronze;
   const xp = Number((profile as any).xp ?? 0);
   const progress = meta.next ? Math.min(100, ((xp - meta.min) / (meta.next - meta.min)) * 100) : 100;
-  const TierIcon = tier === "legend" ? Crown : tier === "platinum" ? Shield : tier === "gold" ? Trophy : Star;
-  const tierOrder = ["bronze", "silver", "gold", "platinum", "legend"];
+  const TierIcon = ["legend", "mythic", "titan", "immortal"].includes(tier) ? Crown : tier === "platinum" ? Shield : tier === "gold" ? Trophy : Star;
+  const tierOrder = ["bronze", "silver", "gold", "platinum", "legend", "mythic", "titan", "immortal"];
 
   return (
     <Card className="relative overflow-hidden p-6 backdrop-blur-xl border-amber-500/30">
