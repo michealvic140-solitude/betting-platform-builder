@@ -20,7 +20,10 @@ const TIER_META: Record<string, { label: string; color: string; min: number; nex
   silver:   { label: "Silver",   color: "from-slate-300 to-slate-500",   min: 500,   next: 3000,  perks: ["+10% stake limit", "Silver chat badge"] },
   gold:     { label: "Gold",     color: "from-amber-400 to-yellow-600",  min: 3000,  next: 10000, perks: ["+25% stake limit", "Faster withdrawals", "Gold chat color"] },
   platinum: { label: "Platinum", color: "from-cyan-300 to-blue-600",     min: 10000, next: 25000, perks: ["+50% stake limit", "Exclusive promos", "Platinum badge"] },
-  legend:   { label: "Legend",   color: "from-fuchsia-500 to-pink-600",  min: 25000, perks: ["+100% stake limit", "Priority support", "Legend animation", "Hall of fame"] },
+  legend:   { label: "Legend",   color: "from-fuchsia-500 to-pink-600",  min: 25000, next: 50000,  perks: ["+100% stake limit", "Priority support", "Legend animation", "Hall of fame"] },
+  mythic:   { label: "Mythic",   color: "from-violet-500 to-indigo-700", min: 50000, next: 100000, perks: ["+150% stake limit", "Mythic aura badge", "Monthly bonus drops"] },
+  titan:    { label: "Titan",    color: "from-emerald-400 to-teal-600",  min: 100000, next: 250000, perks: ["+200% stake limit", "Titan-only events", "Dedicated concierge"] },
+  immortal: { label: "Immortal", color: "from-rose-400 via-amber-300 to-yellow-500", min: 250000, perks: ["Unlimited stake tier", "Immortal hall of legends", "Bespoke rewards", "Lifetime VIP status"] },
 };
 
 /* ============================ REFERRAL CARD ============================ */
