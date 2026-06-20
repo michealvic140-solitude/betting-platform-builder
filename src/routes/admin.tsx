@@ -3604,6 +3604,17 @@ function SettingsPanel() {
           aspect="21 / 9"
           help="Shown behind the “Super Admin Console” banner at the top of the admin & moderator pages. A wide image works best."
         />
+        <ImageSettingControl
+          label="Top navigation bar background"
+          value={s.nav_bg_url}
+          onChange={(url) => setS({ ...s, nav_bg_url: url })}
+          fit={s.nav_bg_fit ?? "cover"}
+          onFitChange={(v) => setS({ ...s, nav_bg_fit: v })}
+          position={s.nav_bg_position ?? "center"}
+          onPositionChange={(v) => setS({ ...s, nav_bg_position: v })}
+          aspect="32 / 9"
+          help="Background image for the sticky top navbar across the whole platform. A very wide, short banner works best. Leave empty to use the default dark bar."
+        />
         <p className="text-[10px] text-amber-300/80">Remember to press “Save settings” below to apply.</p>
       </SettingsSection>
 
