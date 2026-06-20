@@ -104,9 +104,57 @@ function Dashboard() {
         </div>
 
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><HistoryIcon className="h-5 w-5 text-primary" />Bet History</h2>
+        {bets.length > 0 && (
+          <div className="mb-4 space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {[
+                { k: "all", label: "All" },
+                { k: "open", label: "Open" },
+                { k: "won", label: "Won" },
+                { k: "lost", label: "Lost" },
+                { k: "cashed_out", label: "Cashed out" },
+                { k: "suspended", label: "Suspended" },
+                { k: "void", label: "Void" },
+                { k: "refunded", label: "Refunded" },
+              ].map((f) => {
+                const n = f.k === "all" ? bets.length : bets.filter((b) => b.status === f.k).length;
+                if (f.k !== "all" && n === 0) return null;
+                const active = betFilter === f.k;
+                return (
+                  <button
+                    key={f.k}
+                    onClick={() => setBetFilter(f.k)}
+                    className={`text-xs font-semibold rounded-full px-3 py-1.5 border transition ${active ? "bg-primary/20 border-primary/60 text-primary" : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"}`}
+                  >
+                    {f.label} <span className="opacity-70">({n})</span>
+                  </button>
+                );
+              })}
+            </div>
+            <Input
+              value={betSearch}
+              onChange={(e) => setBetSearch(e.target.value)}
+              placeholder="Search by tracking ID, booking code or match…"
+              className="max-w-md"
+            />
+          </div>
+        )}
         <div id="bets" className="space-y-3 scroll-mt-24">
           {bets.length === 0 && <p className="text-muted-foreground text-sm">No bets yet.</p>}
-          {bets.map((b) => (
+          {(() => {
+            const q = betSearch.trim().toLowerCase();
+            const filtered = bets.filter((b) => {
+              if (betFilter !== "all" && b.status !== betFilter) return false;
+              if (!q) return true;
+              const hay = [
+                b.tracking_id,
+                b.booking_code,
+                ...(b.bet_selections ?? []).map((s: any) => s.matches?.name || s.selection_label),
+              ].join(" ").toLowerCase();
+              return hay.includes(q);
+            });
+            if (filtered.length === 0) return <p className="text-muted-foreground text-sm">No bets match this filter.</p>;
+            return filtered.map((b) => (
             <Link key={b.id} to="/ticket/$id" params={{ id: b.id }}>
               <Card className="p-3 hover:border-primary/60 transition group cursor-pointer">
                 <div className="flex items-center justify-between flex-wrap gap-3">
@@ -133,7 +181,8 @@ function Dashboard() {
                 </div>
               </Card>
             </Link>
-          ))}
+            ));
+          })()}
         </div>
 
         <div className="mt-10 flex items-center justify-between flex-wrap gap-2">
