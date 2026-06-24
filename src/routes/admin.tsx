@@ -49,6 +49,7 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { ImageSettingControl } from "@/components/admin/ImageSettingControl";
 import { ClansAdminPanel } from "@/components/admin/ClansAdminPanel";
 import { LotteryAdminPanel } from "@/components/admin/LotteryAdminPanel";
+import { GiftsSpinAdminPanel } from "@/components/admin/GiftsSpinAdminPanel";
 import { TopBetsPanel } from "@/components/admin/TopBetsPanel";
 import { TournamentAdminPanel } from "@/components/admin/TournamentAdminPanel";
 import { seedLegacyUsers } from "@/lib/seed-users.functions";
@@ -195,6 +196,7 @@ export function AdminPage() {
             <TabsContent value="housewallet" className="mt-4"><HouseWalletPanel /></TabsContent>
             <TabsContent value="leaderboard" className="mt-4"><LeaderboardAdminPanel /></TabsContent>
             <TabsContent value="lottery" className="mt-4"><LotteryAdminPanel /></TabsContent>
+            <TabsContent value="giftsspin" className="mt-4"><GiftsSpinAdminPanel /></TabsContent>
             <TabsContent value="promos" className="mt-4"><PromoPanel /></TabsContent>
             <TabsContent value="content" className="mt-4"><ContentPanel /></TabsContent>
             <TabsContent value="tickets" className="mt-4"><TicketsPanel /></TabsContent>

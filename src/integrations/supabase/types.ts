@@ -2525,6 +2525,39 @@ export type Database = {
           },
         ]
       }
+      user_gifts: {
+        Row: {
+          amount: number
+          claimed_at: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          message: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          claimed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          claimed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           assigned_by: string | null
@@ -3125,6 +3158,10 @@ export type Database = {
         Returns: Json
       }
       admin_risk_summary: { Args: never; Returns: Json }
+      admin_send_gift: {
+        Args: { _amount: number; _message?: string; _user_id: string }
+        Returns: Json
+      }
       admin_set_virtual_cycle: { Args: { _running: boolean }; Returns: Json }
       admin_suspend_bet: {
         Args: { _bet_id: string; _reason?: string }
@@ -3159,6 +3196,7 @@ export type Database = {
       can_use_gang_chat: { Args: { _user_id: string }; Returns: boolean }
       claim_challenge: { Args: { _progress_id: string }; Returns: Json }
       claim_daily_login: { Args: never; Returns: Json }
+      claim_gift: { Args: { _gift_id: string }; Returns: Json }
       claim_task: { Args: { _task_id: string }; Returns: Json }
       claim_virtual_payout: { Args: { _id: string }; Returns: Json }
       create_withdrawal_request: {
@@ -3279,6 +3317,7 @@ export type Database = {
         Returns: Json
       }
       settle_pay_winning_bet: { Args: { _bet_id: string }; Returns: Json }
+      spin_wheel: { Args: never; Returns: Json }
       transfer_tokens: {
         Args: { _amount: number; _recipient_special_id: string }
         Returns: Json
