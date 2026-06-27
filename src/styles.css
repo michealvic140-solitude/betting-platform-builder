@@ -450,6 +450,7 @@
       radial-gradient(35% 28% at 70% 15%, oklch(0.72 0.20 120 / 0.30), transparent 70%);
     filter: blur(40px) saturate(150%);
     animation: admin-aurora 16s ease-in-out infinite alternate;
+    will-change: transform;
     z-index: 0;
   }
   .admin-shell-logo {
@@ -464,6 +465,7 @@
     mix-blend-mode: screen;
     z-index: 0;
     animation: admin-logo-float 12s ease-in-out infinite;
+    will-change: transform;
   }
   .admin-hero-frame {
     border: 1px solid oklch(0.78 0.16 88 / 0.45);
