@@ -2191,6 +2191,63 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_pushes: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string
+          error: string | null
+          id: string
+          last_active_days: number | null
+          link: string
+          locale: string
+          role: string
+          scheduled_for: string
+          sent_at: string | null
+          sent_count: number
+          status: string
+          title: string
+          total_count: number
+          updated_at: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          created_by: string
+          error?: string | null
+          id?: string
+          last_active_days?: number | null
+          link?: string
+          locale?: string
+          role?: string
+          scheduled_for: string
+          sent_at?: string | null
+          sent_count?: number
+          status?: string
+          title: string
+          total_count?: number
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string
+          error?: string | null
+          id?: string
+          last_active_days?: number | null
+          link?: string
+          locale?: string
+          role?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          sent_count?: number
+          status?: string
+          title?: string
+          total_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       season_points: {
         Row: {
           correct_scores: number

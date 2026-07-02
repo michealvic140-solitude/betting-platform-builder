@@ -46,6 +46,7 @@ import { Route as TicketIdRouteImport } from './routes/ticket.$id'
 import { Route as MatchesMatchIdRouteImport } from './routes/matches.$matchId'
 import { Route as ApiPublicVirtualTickRouteImport } from './routes/api/public/virtual-tick'
 import { Route as ApiPublicHooksSendPushRouteImport } from './routes/api/public/hooks/send-push'
+import { Route as ApiPublicHooksProcessScheduledPushRouteImport } from './routes/api/public/hooks/process-scheduled-push'
 
 const WithdrawRoute = WithdrawRouteImport.update({
   id: '/withdraw',
@@ -232,6 +233,12 @@ const ApiPublicHooksSendPushRoute = ApiPublicHooksSendPushRouteImport.update({
   path: '/api/public/hooks/send-push',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksProcessScheduledPushRoute =
+  ApiPublicHooksProcessScheduledPushRouteImport.update({
+    id: '/api/public/hooks/process-scheduled-push',
+    path: '/api/public/hooks/process-scheduled-push',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -270,6 +277,7 @@ export interface FileRoutesByFullPath {
   '/ticket/$id': typeof TicketIdRoute
   '/virtual/history': typeof VirtualHistoryRoute
   '/api/public/virtual-tick': typeof ApiPublicVirtualTickRoute
+  '/api/public/hooks/process-scheduled-push': typeof ApiPublicHooksProcessScheduledPushRoute
   '/api/public/hooks/send-push': typeof ApiPublicHooksSendPushRoute
 }
 export interface FileRoutesByTo {
@@ -309,6 +317,7 @@ export interface FileRoutesByTo {
   '/ticket/$id': typeof TicketIdRoute
   '/virtual/history': typeof VirtualHistoryRoute
   '/api/public/virtual-tick': typeof ApiPublicVirtualTickRoute
+  '/api/public/hooks/process-scheduled-push': typeof ApiPublicHooksProcessScheduledPushRoute
   '/api/public/hooks/send-push': typeof ApiPublicHooksSendPushRoute
 }
 export interface FileRoutesById {
@@ -349,6 +358,7 @@ export interface FileRoutesById {
   '/ticket/$id': typeof TicketIdRoute
   '/virtual/history': typeof VirtualHistoryRoute
   '/api/public/virtual-tick': typeof ApiPublicVirtualTickRoute
+  '/api/public/hooks/process-scheduled-push': typeof ApiPublicHooksProcessScheduledPushRoute
   '/api/public/hooks/send-push': typeof ApiPublicHooksSendPushRoute
 }
 export interface FileRouteTypes {
@@ -390,6 +400,7 @@ export interface FileRouteTypes {
     | '/ticket/$id'
     | '/virtual/history'
     | '/api/public/virtual-tick'
+    | '/api/public/hooks/process-scheduled-push'
     | '/api/public/hooks/send-push'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -429,6 +440,7 @@ export interface FileRouteTypes {
     | '/ticket/$id'
     | '/virtual/history'
     | '/api/public/virtual-tick'
+    | '/api/public/hooks/process-scheduled-push'
     | '/api/public/hooks/send-push'
   id:
     | '__root__'
@@ -468,6 +480,7 @@ export interface FileRouteTypes {
     | '/ticket/$id'
     | '/virtual/history'
     | '/api/public/virtual-tick'
+    | '/api/public/hooks/process-scheduled-push'
     | '/api/public/hooks/send-push'
   fileRoutesById: FileRoutesById
 }
@@ -506,6 +519,7 @@ export interface RootRouteChildren {
   WithdrawRoute: typeof WithdrawRoute
   TicketIdRoute: typeof TicketIdRoute
   ApiPublicVirtualTickRoute: typeof ApiPublicVirtualTickRoute
+  ApiPublicHooksProcessScheduledPushRoute: typeof ApiPublicHooksProcessScheduledPushRoute
   ApiPublicHooksSendPushRoute: typeof ApiPublicHooksSendPushRoute
 }
 
@@ -770,6 +784,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSendPushRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/process-scheduled-push': {
+      id: '/api/public/hooks/process-scheduled-push'
+      path: '/api/public/hooks/process-scheduled-push'
+      fullPath: '/api/public/hooks/process-scheduled-push'
+      preLoaderRoute: typeof ApiPublicHooksProcessScheduledPushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -830,6 +851,8 @@ const rootRouteChildren: RootRouteChildren = {
   WithdrawRoute: WithdrawRoute,
   TicketIdRoute: TicketIdRoute,
   ApiPublicVirtualTickRoute: ApiPublicVirtualTickRoute,
+  ApiPublicHooksProcessScheduledPushRoute:
+    ApiPublicHooksProcessScheduledPushRoute,
   ApiPublicHooksSendPushRoute: ApiPublicHooksSendPushRoute,
 }
 export const routeTree = rootRouteImport

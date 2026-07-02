@@ -9,6 +9,8 @@ const schema = z.object({
   role: z.string().trim().optional().default("any"),
   locale: z.string().trim().max(40).optional().default(""),
   lastActiveDays: z.number().int().positive().max(3650).nullable().optional(),
+  // ISO datetime string; when present in the future the push is scheduled.
+  scheduledFor: z.string().trim().max(40).optional().default(""),
 });
 
 const audienceSchema = z.object({
@@ -19,101 +21,55 @@ const audienceSchema = z.object({
 
 type Audience = z.infer<typeof audienceSchema>;
 
-async function getAudienceSubscriptions(supabaseAdmin: any, audience: Audience) {
-  let query = supabaseAdmin
-    .from("push_subscriptions")
-    .select("id, user_id, endpoint, p256dh, auth_key, locale, last_seen_at")
-    .eq("enabled", true);
-
-  const locale = audience.locale?.trim();
-  if (locale) query = query.ilike("locale", `${locale.replace("_", "-")}%`);
-
-  const { data: initial, error } = await query;
-  if (error) throw error;
-  let subs = (initial ?? []) as any[];
-  const userIds = Array.from(new Set(subs.map((s) => s.user_id).filter(Boolean)));
-
-  const role = audience.role && audience.role !== "any" ? audience.role : "";
-  if (role) {
-    const { data: roles } = await supabaseAdmin
-      .from("user_roles")
-      .select("user_id")
-      .eq("role", role)
-      .in("user_id", userIds.length ? userIds : ["00000000-0000-0000-0000-000000000000"]);
-    const allowed = new Set((roles ?? []).map((r: any) => r.user_id));
-    subs = subs.filter((s) => allowed.has(s.user_id));
-  }
-
-  if (audience.lastActiveDays) {
-    const since = new Date(Date.now() - audience.lastActiveDays * 24 * 60 * 60 * 1000).toISOString();
-    const ids = Array.from(new Set(subs.map((s) => s.user_id).filter(Boolean)));
-    const { data: sessions } = await supabaseAdmin
-      .from("user_sessions")
-      .select("user_id")
-      .gte("last_seen", since)
-      .in("user_id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]);
-    const active = new Set((sessions ?? []).map((s: any) => s.user_id));
-    subs = subs.filter((s) => active.has(s.user_id));
-  }
-
-  return subs;
+async function assertAdmin(context: any) {
+  const { supabase, userId } = context;
+  const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+  if (!isAdmin) throw new Error("Forbidden");
+  return userId as string;
 }
 
 /**
- * Admin-only: send a web-push notification to every subscribed device.
- * Also records the broadcast and creates in-app notifications for history.
+ * Admin-only: send a web-push notification now, or schedule it for later.
  */
 export const broadcastPush = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => schema.parse(data))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-
-    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
-
+    const userId = await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Scheduling: store for the cron processor and return early.
+    const when = data.scheduledFor ? new Date(data.scheduledFor) : null;
+    if (when && !isNaN(when.getTime()) && when.getTime() > Date.now() + 30_000) {
+      const { error } = await supabaseAdmin.from("scheduled_pushes").insert({
+        title: data.title,
+        body: data.body || "",
+        link: data.link || "/",
+        role: data.role || "any",
+        locale: data.locale || "",
+        last_active_days: data.lastActiveDays ?? null,
+        scheduled_for: when.toISOString(),
+        status: "pending",
+        created_by: userId,
+      } as any);
+      if (error) return { ok: false, sent: 0, total: 0, error: error.message };
+      return { ok: true, scheduled: true, scheduledFor: when.toISOString(), sent: 0, total: 0 };
+    }
+
+    // Immediate send.
+    const { getAudienceSubscriptions, configureWebPush, sendToSubscriptions } = await import("@/lib/push-send.server");
     const webpush = (await import("web-push")).default;
 
-    const pub = process.env.VAPID_PUBLIC_KEY;
-    const priv = process.env.VAPID_PRIVATE_KEY;
-    if (!pub || !priv) return { ok: false, sent: 0, removed: 0, error: "VAPID keys not configured." };
+    const configured = await configureWebPush(webpush, supabaseAdmin);
+    if (!configured) return { ok: false, sent: 0, total: 0, error: "VAPID keys not configured." };
 
-    const { data: priv2 } = await supabaseAdmin
-      .from("app_settings_private")
-      .select("vapid_subject")
-      .eq("id", 1)
-      .maybeSingle();
-    const subject = (priv2 as any)?.vapid_subject || "mailto:admin@example.com";
-    webpush.setVapidDetails(subject, pub, priv);
-
-    const subs = await getAudienceSubscriptions(supabaseAdmin, data);
-
-    const payload = JSON.stringify({
+    const subs = await getAudienceSubscriptions(supabaseAdmin, data as Audience);
+    const { sent, removed, total } = await sendToSubscriptions(webpush, supabaseAdmin, subs, {
       title: data.title,
-      body: data.body || "",
-      link: data.link || "/",
-      tag: "broadcast-" + Date.now(),
+      body: data.body,
+      link: data.link,
     });
 
-    let sent = 0;
-    const dead: string[] = [];
-    for (const s of subs ?? []) {
-      const sub: any = s;
-      if (!sub.endpoint?.startsWith("http")) continue;
-      try {
-        await webpush.sendNotification(
-          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth_key } } as any,
-          payload,
-        );
-        sent++;
-      } catch (err: any) {
-        if (err?.statusCode === 410 || err?.statusCode === 404) dead.push(sub.id);
-      }
-    }
-    if (dead.length) await supabaseAdmin.from("push_subscriptions").update({ enabled: false, disabled_at: new Date().toISOString() } as any).in("id", dead);
-
-    // Record the broadcast for history.
     await supabaseAdmin.from("broadcasts").insert({
       title: data.title,
       body: data.body || "",
@@ -123,17 +79,46 @@ export const broadcastPush = createServerFn({ method: "POST" })
       created_by: userId,
     });
 
-    return { ok: true, sent, removed: dead.length, total: subs.length };
+    return { ok: true, sent, removed, total };
   });
 
 export const getPushSubscriberCount = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => audienceSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
+    await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { getAudienceSubscriptions } = await import("@/lib/push-send.server");
     const subs = await getAudienceSubscriptions(supabaseAdmin, data as Audience);
     return { count: subs.length };
+  });
+
+/** Admin-only: list scheduled + recently sent push blasts. */
+export const listScheduledPushes = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("scheduled_pushes")
+      .select("id, title, body, link, role, locale, last_active_days, scheduled_for, status, sent_count, total_count, error, sent_at, created_at")
+      .order("scheduled_for", { ascending: true })
+      .limit(50);
+    return { items: data ?? [] };
+  });
+
+/** Admin-only: cancel a pending scheduled push. */
+export const cancelScheduledPush = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("scheduled_pushes")
+      .update({ status: "cancelled" } as any)
+      .eq("id", data.id)
+      .eq("status", "pending");
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
   });
