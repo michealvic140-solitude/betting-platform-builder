@@ -930,7 +930,21 @@ function UserEditDialog({ user, roles, onClose }: { user: any; roles: string[]; 
               <section>
                 <div className="flex items-center justify-between mb-2">
                   <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Bet history ({bets.length})</div>
-                  <div className="text-[10px] text-muted-foreground">Stake → Potential</div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-[10px]"
+                      onClick={async () => {
+                        const { data, error } = await supabase.rpc("resettle_won_bets");
+                        if (error) { toast.error(error.message); return; }
+                        toast.success(Number(data) > 0 ? `Corrected ${data} stuck ticket(s) to WON` : "No stuck tickets found");
+                      }}
+                    >
+                      Fix stuck won tickets
+                    </Button>
+                    <div className="text-[10px] text-muted-foreground">Stake → Potential</div>
+                  </div>
                 </div>
                 {bets.length === 0 && <div className="text-xs text-muted-foreground">No bets placed.</div>}
                 <div className="space-y-2">
