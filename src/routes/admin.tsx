@@ -1667,6 +1667,7 @@ function FuturesAdminPanel() {
     await supabase.from("markets").update({ is_open: false }).eq("match_id", match.id);
     await supabase.from("matches").update({ status: "ended", settled_at: new Date().toISOString() } as any).eq("id", match.id);
     await settleFutureBets(match.id, winners.map((o: any) => o.id), winners.map((o: any) => o.label).join(", "));
+    await supabase.rpc("resettle_won_bets");
     await logAudit("future_market_settled", "match", match.id, { winners: winners.map((o: any) => o.label) });
     toast.success("Future settled and tickets updated");
     load();
