@@ -930,7 +930,21 @@ function UserEditDialog({ user, roles, onClose }: { user: any; roles: string[]; 
               <section>
                 <div className="flex items-center justify-between mb-2">
                   <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Bet history ({bets.length})</div>
-                  <div className="text-[10px] text-muted-foreground">Stake → Potential</div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-[10px]"
+                      onClick={async () => {
+                        const { data, error } = await supabase.rpc("resettle_won_bets");
+                        if (error) { toast.error(error.message); return; }
+                        toast.success(Number(data) > 0 ? `Corrected ${data} stuck ticket(s) to WON` : "No stuck tickets found");
+                      }}
+                    >
+                      Fix stuck won tickets
+                    </Button>
+                    <div className="text-[10px] text-muted-foreground">Stake → Potential</div>
+                  </div>
                 </div>
                 {bets.length === 0 && <div className="text-xs text-muted-foreground">No bets placed.</div>}
                 <div className="space-y-2">
@@ -1244,6 +1258,9 @@ function MatchesPanel() {
     await supabase.from("matches").update({ home_score: hs, away_score: as, status: "ended", winner_team_id: winnerId }).eq("id", m.id);
     await supabase.from("markets").update({ is_open: false }).eq("match_id", m.id);
     await settleBetsForMatch(m.id, winnerId, hs, as);
+    // Self-heal: an accumulator whose last-resolving leg completes here may have
+    // been wrongly stranded at "lost" earlier — credit any all-won ticket now.
+    await supabase.rpc("resettle_won_bets");
     await logAudit("match_settled", "match", m.id, { home_score: hs, away_score: as, winner_team_id: winnerId });
     window.dispatchEvent(new CustomEvent("admin:futures-refresh", { detail: { matchId: m.id } }));
     toast.success("Match settled — bets paid out"); load();
@@ -1664,6 +1681,7 @@ function FuturesAdminPanel() {
     await supabase.from("markets").update({ is_open: false }).eq("match_id", match.id);
     await supabase.from("matches").update({ status: "ended", settled_at: new Date().toISOString() } as any).eq("id", match.id);
     await settleFutureBets(match.id, winners.map((o: any) => o.id), winners.map((o: any) => o.label).join(", "));
+    await supabase.rpc("resettle_won_bets");
     await logAudit("future_market_settled", "match", match.id, { winners: winners.map((o: any) => o.label) });
     toast.success("Future settled and tickets updated");
     load();
