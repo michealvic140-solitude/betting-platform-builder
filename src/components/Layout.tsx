@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, User as UserIcon, Shield, MessageSquare, Home, Trophy, Ticket, LifeBuoy, Wallet, Crosshair as MatchIcon, Settings as SettingsIcon, Coins, LayoutDashboard, Dice5, Swords, Clover, ClipboardList, ListChecks, Gamepad2, ShoppingBag } from "lucide-react";
+import { LogOut, User as UserIcon, Shield, MessageSquare, Home, Trophy, Ticket, LifeBuoy, Wallet, Crosshair as MatchIcon, Settings as SettingsIcon, Coins, LayoutDashboard, Dice5, Swords, Clover, ListChecks, Gamepad2, ShoppingBag } from "lucide-react";
 import { GangLogo } from "@/components/GangLogo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -130,7 +130,6 @@ export const Layout = ({ children }: { children: ReactNode }) => {
             <NavLink to="/tournament" icon={Swords} label="Tournament" />
             {user && <NavLink to="/dashboard" icon={LayoutDashboard} label="Dashboard" />}
             {user && <NavLink to="/tasks" icon={ListChecks} label="Tasks" />}
-            {user && <NavLink to="/surveys" icon={ClipboardList} label="Surveys" />}
             {user && <NavLink to="/checkout" icon={Coins} label="Buy" />}
             {user && <NavLink to="/withdraw" icon={Wallet} label="Withdraw" />}
             {user && <NavLink to="/support" icon={LifeBuoy} label="Support" />}
@@ -204,7 +203,6 @@ export const Layout = ({ children }: { children: ReactNode }) => {
           {user && <>
             <MobLink to="/dashboard" icon={Ticket} label="ME" />
             <MobLink to="/tasks" icon={ListChecks} label="Tasks" />
-            <MobLink to="/surveys" icon={ClipboardList} label="Surveys" />
             <MobLink to="/profile" icon={UserIcon} label="Profile" />
             <MobLink to="/settings" icon={SettingsIcon} label="Settings" />
             <MobLink to="/support" icon={LifeBuoy} label="Help" />
