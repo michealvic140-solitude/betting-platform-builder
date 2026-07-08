@@ -108,26 +108,53 @@ export function BetVoucher({ bet, sels, statusBadge, copy, shareCode }: {
     const lead = m.home_score > m.away_score ? m.home_team?.name : m.away_score > m.home_score ? m.away_team?.name : "Draw";
     return s.selection_label === lead;
   }
+  // Resolve a single selection's outcome even before the backend settles the whole bet,
+  // so an ended match never lingers on "PENDING".
+  function selResult(s: any): "won" | "lost" | "pending" {
+    if (s.result === "won") return "won";
+    if (s.result === "lost") return "lost";
+    const m = s.matches;
+    if (m?.match_kind === "future") {
+      if (s.odds?.future_status === "winner") return "won";
+      if (["disqualified", "eliminated", "settled_lost"].includes(s.odds?.future_status)) return "lost";
+      return "pending";
+    }
+    if (!m || m.status !== "ended") return "pending";
+    if (s.markets?.name === "Correct Score") return s.selection_label === `${m.home_score}-${m.away_score}` ? "won" : "lost";
+    const lead = m.home_score > m.away_score ? m.home_team?.name : m.away_score > m.home_score ? m.away_team?.name : "Draw";
+    return s.selection_label === lead ? "won" : "lost";
+  }
   // Cash-out only when every match has ended and every selection won.
   const allWon = sels.length > 0 && sels.every(endedWin);
   const cashoutValue = Number(bet.potential_payout);
   const isVirtualTicket = sels.some((s: any) => s.matches?.is_virtual);
   const isFutureTicket = sels.some((s: any) => s.matches?.match_kind === "future");
+  // Derive an effective ticket status: if the backend hasn't settled yet but every
+  // leg has already resolved, reflect the real result instead of showing PENDING.
+  const resolved = sels.map(selResult);
+  const anyLost = resolved.includes("lost");
+  const allResolvedWon = sels.length > 0 && resolved.every((r) => r === "won");
+  const effectiveStatus =
+    status === "won" || status === "lost" || status === "cashed_out" || status === "void" || status === "refunded" || status === "suspended"
+      ? status
+      : anyLost ? "lost"
+      : allResolvedWon ? "won"
+      : "open";
   const statusBarCls =
-    status === "won" || status === "cashed_out" ? "voucher-status-bar-won"
-    : status === "lost" ? "voucher-status-bar-lost"
+    effectiveStatus === "won" || effectiveStatus === "cashed_out" ? "voucher-status-bar-won"
+    : effectiveStatus === "lost" ? "voucher-status-bar-lost"
     : "voucher-status-bar-pending";
   const statusBarIcon =
-    status === "won" || status === "cashed_out" ? <Trophy className="h-4 w-4" />
-    : status === "lost" ? <X className="h-4 w-4" />
+    effectiveStatus === "won" || effectiveStatus === "cashed_out" ? <Trophy className="h-4 w-4" />
+    : effectiveStatus === "lost" ? <X className="h-4 w-4" />
     : <ClockIcon className="h-4 w-4" />;
   const statusBarText =
-    status === "won" ? "BET STATUS: CONGRATULATIONS, YOU WON!"
-    : status === "cashed_out" ? "BET STATUS: CASHED OUT SUCCESSFULLY"
-    : status === "lost" ? "BET STATUS: BETTER LUCK NEXT ROUND"
-    : status === "void" ? "BET STATUS: TICKET VOIDED"
-    : status === "refunded" ? "BET STATUS: REFUNDED"
-    : status === "suspended" ? "BET STATUS: SUSPENDED BY ADMIN"
+    effectiveStatus === "won" ? (status === "won" ? "BET STATUS: CONGRATULATIONS, YOU WON!" : "BET STATUS: ALL LEGS WON · SETTLING…")
+    : effectiveStatus === "cashed_out" ? "BET STATUS: CASHED OUT SUCCESSFULLY"
+    : effectiveStatus === "lost" ? "BET STATUS: BETTER LUCK NEXT ROUND"
+    : effectiveStatus === "void" ? "BET STATUS: TICKET VOIDED"
+    : effectiveStatus === "refunded" ? "BET STATUS: REFUNDED"
+    : effectiveStatus === "suspended" ? "BET STATUS: SUSPENDED BY ADMIN"
     : "BET STATUS: PENDING SETTLEMENT";
 
   return (
