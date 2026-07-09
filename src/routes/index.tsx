@@ -157,7 +157,7 @@ function Index() {
       {/* Match feed on the left · Hot Bets + Hall of Fame stacked on the right */}
       <section className="container mt-10">
         <div className="grid gap-6 lg:grid-cols-[1fr_340px] items-start">
-          <div className="space-y-10 min-w-0 order-2 lg:order-1">
+          <div className="space-y-10 min-w-0">
           {loading && <p className="text-muted-foreground">Loading league…</p>}
           {!loading && featuredFallback.length > 0 && (
             <div>
@@ -199,7 +199,7 @@ function Index() {
             </div>
           ))}
           </div>
-          <aside className="space-y-8 min-w-0 order-1 lg:order-2 lg:sticky lg:top-20 self-start">
+          <aside className="space-y-8 min-w-0 lg:sticky lg:top-20 self-start">
             <div>
               <SectionHeader icon={Flame} title="Hot Bets" subtitle="What the league is backing right now." />
               <div className="mt-4"><HotBets /></div>
