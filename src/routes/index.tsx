@@ -11,6 +11,8 @@ import { AnnouncementSlider, HighlightsRow, AdsRow } from "@/components/HomeCont
 import { HomeBannerSlider } from "@/components/HomeBannerSlider";
 import { GrandPrizeWinners } from "@/components/GrandPrizeWinners";
 import { HotBets } from "@/components/HotBets";
+import { NewsSlider } from "@/components/NewsSlider";
+import { LotteryResultsCard } from "@/components/LotteryResultsCard";
 import { SeasonBanner } from "@/components/SeasonBanner";
 import { Spotlight } from "@/components/Spotlight";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -218,9 +220,14 @@ function Index() {
           ))}
           </div>
           <aside className="space-y-6 min-w-0 lg:sticky lg:top-20 self-start">
+            <NewsSlider />
             <div>
               <SectionHeader icon={Flame} title="Hot Bets" subtitle="What the league is backing right now." />
               <div className="mt-3"><HotBets /></div>
+            </div>
+            <div>
+              <SectionHeader icon={Dice5} title="Lottery Results" subtitle="Latest lucky numbers — auto-drawn every 30 min." />
+              <div className="mt-3"><LotteryResultsCard /></div>
             </div>
             <div>
               <SectionHeader icon={Trophy} title="Hall of Fame" subtitle="Grand prize winners — most tokens won." />
