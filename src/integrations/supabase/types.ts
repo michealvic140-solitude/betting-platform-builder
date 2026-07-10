@@ -1585,6 +1585,42 @@ export type Database = {
           },
         ]
       }
+      news: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          link_url: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          link_url?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          link_url?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notification_prefs: {
         Row: {
           bet_results: boolean
@@ -3719,6 +3755,10 @@ export type Database = {
         }
         Returns: Json
       }
+      _settle_lottery_draw: {
+        Args: { _draw_id: string; _winning: number[] }
+        Returns: Json
+      }
       admin_adjust_xp: {
         Args: { _delta: number; _reason?: string; _user_id: string }
         Returns: Json
@@ -3853,6 +3893,7 @@ export type Database = {
         Args: { _id: string; _note?: string }
         Returns: string
       }
+      auto_draw_due_lotteries: { Args: never; Returns: number }
       auto_resolve_virtual_round: { Args: { _match_id: string }; Returns: Json }
       can_use_gang_chat: { Args: { _user_id: string }; Returns: boolean }
       claim_challenge: { Args: { _progress_id: string }; Returns: Json }
