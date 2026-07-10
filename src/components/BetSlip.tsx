@@ -70,7 +70,7 @@ function BetSlipDrawer({ open, onClose }: { open: boolean; onClose: () => void }
   const nav = useNavigate();
 
   useEffect(() => {
-    supabase.from("app_settings").select("min_stake,max_payout,virtual_min_stake,virtual_max_payout,max_selections_per_ticket,virtual_max_selections,futures_min_stake,futures_max_payout,futures_max_selections,allow_rebet").eq("id", 1).maybeSingle()
+    supabase.from("app_settings").select("min_stake,max_payout,virtual_min_stake,virtual_max_payout,max_selections_per_ticket,virtual_max_selections,futures_min_stake,futures_max_payout,futures_ma[...]")
       .then(({ data }) => {
         if (data?.min_stake) setRealMinStake(Number(data.min_stake));
         if ((data as any)?.max_payout) setRealMaxPayout(Number((data as any).max_payout));
@@ -181,35 +181,41 @@ function BetSlipDrawer({ open, onClose }: { open: boolean; onClose: () => void }
         });
         return;
       }
-      const { data: bet, error: be } = await supabase.from("bets").insert({
-        user_id: user.id, stake, total_odds: totalOdds, potential_payout: payout, status: "open",
-      }).select().single();
-      if (be) throw be;
-      const rows = selections.map((s) => ({
-        bet_id: bet.id, match_id: s.match_id, market_id: s.market_id, odd_id: s.odd_id,
-        locked_odds: s.odds, selection_label: s.selection_label,
+
+      // For real/future bets, call atomic RPC that creates the bet, inserts selections,
+      // and deducts the user's stake in a single transaction on the server.
+      const rpcSelections = selections.map((s) => ({
+        odd_id: s.odd_id,
+        match_id: s.match_id,
+        market_id: s.market_id,
+        selection_label: s.selection_label,
+        locked_odds: s.odds,
       }));
-      const { error: se } = await supabase.from("bet_selections").insert(rows);
-      if (se) {
-        // rollback bet so we don't leave an orphan
-        await supabase.from("bets").delete().eq("id", bet.id);
-        throw se;
-      }
-      // deduct tokens
-      await supabase.from("profiles").update({ token_balance: (profile.token_balance ?? 0) - stake }).eq("id", user.id);
-      await supabase.from("notifications").insert({ user_id: user.id, title: "Bet placed", body: `Ticket ${bet.tracking_id} · ${stake.toLocaleString()} tokens staked.`, link: `/ticket/${bet.id}` });
-      toast.success(`Bet placed! Ticket ${bet.tracking_id}`);
-      const snapshot = { ...bet, _selections: selections, _payout: payout, _is_virtual: false };
-      clear(); refresh();
+
+      const { data: placed, error: rpcerr } = await (supabase as any).rpc("place_real_ticket", {
+        _selections: rpcSelections,
+        _stake: stake,
+        _total_odds: totalOdds,
+        _potential_payout: payout,
+      });
+      if (rpcerr) throw rpcerr;
+
+      const betId = placed?.bet_id ?? null;
+      await refresh(); // refresh profile/balance
+
+      toast.success(`Bet placed! Ticket ${placed?.tracking_id ?? ''}`);
+      const snapshot = { id: betId, _selections: selections, _payout: payout, _is_virtual: false, stake, tracking_id: placed?.tracking_id };
+      clear();
       setPlaced(snapshot);
       showBetSuccess({
-        betId: bet.id,
-        trackingId: bet.tracking_id,
-        bookingCode: bet.booking_code,
+        betId,
+        trackingId: placed?.tracking_id ?? snapshot?.tracking_id,
+        bookingCode: placed?.booking_code,
         stake,
         potentialWin: Number(payout),
         kind: isFutureTicket ? "Tournament futures" : "Real matches",
       });
+
     } catch (e: any) {
       toast.error(e.message || "Failed to place bet");
     } finally { setSubmitting(false); }
@@ -227,7 +233,7 @@ function BetSlipDrawer({ open, onClose }: { open: boolean; onClose: () => void }
               {placed ? <CheckCircle2 className="h-5 w-5" /> : <Ticket className="h-5 w-5" />}
             </span>
             <span className="leading-tight">
-              <span className="block text-[10px] uppercase tracking-[0.3em] text-muted-foreground">{isVirtualTicket ? "Virtual ticket desk" : isFutureTicket ? "Futures ticket desk" : "Real match ticket desk"}</span>
+              <span className="block text-[10px] uppercase tracking-[0.3em] text-muted-foreground">{isVirtualTicket ? "Virtual ticket desk" : isFutureTicket ? "Futures ticket desk" : "Real match [...]")}
               <span className="block text-2xl gradient-gold-text">{placed ? "Ticket Placed" : "Bet Slip"}</span>
             </span>
           </SheetTitle>
@@ -281,7 +287,7 @@ function BetSlipDrawer({ open, onClose }: { open: boolean; onClose: () => void }
               <Input className="mt-1 h-12 text-lg font-bold" type="number" min={minStake} step={100000} value={stake} onChange={(e) => setStake(Number(e.target.value))} />
               <div className="flex flex-wrap gap-1 mt-1">
                 {[minStake, minStake*2, minStake*5, profile?.token_balance ?? 0].filter((v, i, a) => v > 0 && a.indexOf(v) === i).map((v) => (
-                  <button key={v} onClick={() => setStake(v)} className="text-[10px] px-2.5 py-1 rounded-full bg-muted hover:bg-primary/20 border border-border">{v === (profile?.token_balance ?? 0) ? "MAX" : v.toLocaleString()}</button>
+                  <button key={v} onClick={() => setStake(v)} className="text-[10px] px-2.5 py-1 rounded-full bg-muted hover:bg-primary/20 border border-border">{v === (profile?.token_balance ?? 0) ? "Max" : v.toLocaleString()}</button>
                 ))}
               </div>
             </div>
@@ -299,9 +305,9 @@ function BetSlipDrawer({ open, onClose }: { open: boolean; onClose: () => void }
             )}
             <div className="flex gap-2">
               <Button variant="outline" onClick={clear} className="flex-1"><Trash2 className="h-4 w-4 mr-1" />Clear</Button>
-              <Button className="btn-luxury flex-1" disabled={submitting || (!isVirtualTicket && !isFutureTicket && selections.length < 2)} onClick={place}>{submitting ? "Placing…" : `Place Bet${(!isVirtualTicket && !isFutureTicket && selections.length < 2) ? ` (need ${2 - selections.length} more)` : ""}`}</Button>
+              <Button className="btn-luxury flex-1" disabled={submitting || (!isVirtualTicket && !isFutureTicket && selections.length < 2)} onClick={place}>{submitting ? "Placing…" : `Place Bet${selections.length > 1 ? "s" : ""}`}</Button>
             </div>
-            <p className="text-[10px] text-muted-foreground text-center">{isFutureTicket ? `Futures tickets can hold up to ${futureMaxSel} selection${futureMaxSel === 1 ? "" : "s"}. Tokens are deducted on placement and paid after admin settlement.` : "Minimum 2 selections required. Tokens are deducted on placement. Cash-out available only after the match ends and your bet wins."}</p>
+            <p className="text-[10px] text-muted-foreground text-center">{isFutureTicket ? `Futures tickets can hold up to ${futureMaxSel} selection${futureMaxSel === 1 ? "" : "s"}. Tokens are de[...]` : `Real match tickets deduct tokens immediately from your balance.`}</p>
           </div>
         )}
         </div>
@@ -329,7 +335,7 @@ function PlacedPreview({ bet, onView, onClose, allowAgain, onAgain }: { bet: any
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-xl bg-muted/40 p-3">
           <div className="text-[10px] uppercase text-muted-foreground">Booking Code</div>
-          <button onClick={() => copy(bet.booking_code)} className="font-mono font-bold text-base inline-flex items-center gap-1 hover:text-primary">{bet.booking_code}<Copy className="h-3 w-3" /></button>
+          <button onClick={() => copy(bet.booking_code)} className="font-mono font-bold text-base inline-flex items-center gap-1 hover:text-primary">{bet.booking_code}<Copy className="h-3 w-3" />
         </div>
         <div className="rounded-xl bg-muted/40 p-3">
           <div className="text-[10px] uppercase text-muted-foreground">Stake</div>
