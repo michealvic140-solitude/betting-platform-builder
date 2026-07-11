@@ -6,7 +6,7 @@ import Autoplay from "embla-carousel-autoplay";
 import { ArrowRight } from "lucide-react";
 
 /** Wide auto-sliding promo banners shown at the top of the home page. */
-export function HomeBannerSlider() {
+export function HomeBannerSlider({ embedded = false }: { embedded?: boolean }) {
   const [items, setItems] = useState<any[]>([]);
   const navigate = useNavigate();
 
@@ -28,9 +28,8 @@ export function HomeBannerSlider() {
     navigate({ to: to as any }).catch(() => { window.location.href = to; });
   };
 
-  return (
-    <section className="container mt-4">
-      <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 4500, stopOnInteraction: false })]}>
+  const carousel = (
+    <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 4500, stopOnInteraction: false })]}>
         <CarouselContent>
           {items.map((b) => (
             <CarouselItem key={b.id}>
@@ -58,7 +57,9 @@ export function HomeBannerSlider() {
             </CarouselItem>
           ))}
         </CarouselContent>
-      </Carousel>
-    </section>
+    </Carousel>
   );
+
+  if (embedded) return carousel;
+  return <section className="container mt-4">{carousel}</section>;
 }
