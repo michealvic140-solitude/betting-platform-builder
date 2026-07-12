@@ -3967,6 +3967,10 @@ export type Database = {
         Args: { _draw_id: string; _numbers: number[]; _stake: number }
         Returns: Json
       }
+      place_real_ticket: {
+        Args: { _selections: Json; _stake: number }
+        Returns: Json
+      }
       place_virtual_bet: {
         Args: { _match_id: string; _odd_id: string; _stake: number }
         Returns: Json

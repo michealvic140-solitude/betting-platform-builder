@@ -115,7 +115,7 @@ function Index() {
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background" />
-        <div className="container relative py-20 md:py-32">
+        <div className="container relative py-8 md:py-14">
           {settings?.site_logo_url && (
             <img
               src={settings.site_logo_url}
@@ -187,7 +187,9 @@ function Index() {
                                 className="absolute inset-0 h-full w-full"
                                 style={{ objectFit: (m.featured_image_fit as any) || "cover", objectPosition: m.featured_image_position || "center" }}
                               />
-                              <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/35 to-background/70" />
+                              {/* Keep the uploaded image fully visible — only a soft bottom
+                                  scrim behind the card content for legibility. */}
+                              <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-background/80 via-background/25 to-transparent" />
                               <div className="relative p-4 md:p-6"><MatchCardLive match={m} /></div>
                             </div>
                           ) : (
@@ -249,7 +251,7 @@ function Index() {
 function FuturesSection({ title, markets, maxSelections, featured = [] }: { title: string; markets: MatchRow[]; maxSelections: number; featured?: MatchRow[] }) {
   const { selections, add, remove, setOpen } = useBetSlip();
   return (
-    <section className="container mt-10">
+    <section className="container mt-6">
       <div className="seasonal-golden relative overflow-hidden rounded-3xl mb-5 px-5 py-6 md:px-8 md:py-8">
         <div className="pointer-events-none absolute -right-10 -top-10 opacity-25">
           <Trophy className="h-44 w-44 text-amber-200" />

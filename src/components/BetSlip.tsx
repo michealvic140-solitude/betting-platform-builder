@@ -181,33 +181,29 @@ function BetSlipDrawer({ open, onClose }: { open: boolean; onClose: () => void }
         });
         return;
       }
-      const { data: bet, error: be } = await supabase.from("bets").insert({
-        user_id: user.id, stake, total_odds: totalOdds, potential_payout: payout, status: "open",
-      }).select().single();
-      if (be) throw be;
-      const rows = selections.map((s) => ({
-        bet_id: bet.id, match_id: s.match_id, market_id: s.market_id, odd_id: s.odd_id,
-        locked_odds: s.odds, selection_label: s.selection_label,
-      }));
-      const { error: se } = await supabase.from("bet_selections").insert(rows);
-      if (se) {
-        // rollback bet so we don't leave an orphan
-        await supabase.from("bets").delete().eq("id", bet.id);
-        throw se;
-      }
-      // deduct tokens
-      await supabase.from("profiles").update({ token_balance: (profile.token_balance ?? 0) - stake }).eq("id", user.id);
-      await supabase.from("notifications").insert({ user_id: user.id, title: "Bet placed", body: `Ticket ${bet.tracking_id} · ${stake.toLocaleString()} tokens staked.`, link: `/ticket/${bet.id}` });
-      toast.success(`Bet placed! Ticket ${bet.tracking_id}`);
-      const snapshot = { ...bet, _selections: selections, _payout: payout, _is_virtual: false };
+      // Place the ticket + deduct tokens atomically on the server. Doing the
+      // deduction client-side was unreliable (it could silently no-op), so
+      // members could place real/futures bets without losing tokens.
+      const { data: placedReal, error: rpcErr } = await (supabase as any).rpc("place_real_ticket", {
+        _selections: selections.map((s) => ({ odd_id: s.odd_id })),
+        _stake: stake,
+      });
+      if (rpcErr) throw rpcErr;
+      const betId = placedReal?.bet_id;
+      const { data: bet } = betId
+        ? await supabase.from("bets").select("*").eq("id", betId).maybeSingle()
+        : { data: null } as any;
+      const trackingId = placedReal?.tracking_id ?? bet?.tracking_id;
+      toast.success(`Bet placed! Ticket ${trackingId}`);
+      const snapshot = { ...(bet ?? {}), id: betId, _selections: selections, _payout: Number(placedReal?.payout ?? payout), _is_virtual: false };
       clear(); refresh();
       setPlaced(snapshot);
       showBetSuccess({
-        betId: bet.id,
-        trackingId: bet.tracking_id,
-        bookingCode: bet.booking_code,
+        betId,
+        trackingId,
+        bookingCode: bet?.booking_code,
         stake,
-        potentialWin: Number(payout),
+        potentialWin: Number(placedReal?.payout ?? payout),
         kind: isFutureTicket ? "Tournament futures" : "Real matches",
       });
     } catch (e: any) {
