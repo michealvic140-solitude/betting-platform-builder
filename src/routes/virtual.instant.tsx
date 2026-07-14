@@ -18,7 +18,6 @@ import { TeamLogo } from "@/components/TeamLogo";
 import type { MarketRow, MatchRow, OddRow } from "@/lib/queries";
 import { useBetSlip } from "@/contexts/BetSlipContext";
 import { toast } from "sonner";
-import { UserVirtualRoundDialog } from "@/components/UserVirtualRoundDialog";
 
 type VirtualMatch = MatchRow & {
   lock_time?: string | null;
@@ -161,7 +160,11 @@ function VirtualPage() {
       <div className="virtual-page min-h-[calc(100vh-4rem)]">
         <div className="container py-4 sm:py-6 space-y-4">
           <RoundHeader featured={featured} phase={phase} round={round} />
-          <UserVirtualRoundDialog />
+          <Card className="virtual-panel px-3 py-2 flex items-center gap-2 text-[11px]">
+            <Radio className="h-3.5 w-3.5 text-emerald-400 animate-pulse" />
+            <span className="font-black uppercase tracking-widest text-emerald-300">Play as you stake</span>
+            <span className="text-muted-foreground">— your shootout goes live automatically the moment your bet is placed. No countdown, no waiting.</span>
+          </Card>
 
           {!featured ? (
             <Card className="virtual-panel p-10 text-center text-muted-foreground">
@@ -295,35 +298,8 @@ function ShootoutStage({
         </Card>
       )}
 
-      {/* Countdown (left) + Previous scores (right) */}
-      <div className="grid grid-cols-2 gap-3">
-        <Card className="virtual-panel p-3">
-          <div className="text-[10px] font-black uppercase tracking-[0.25em] text-primary/80 mb-1">
-            {live ? "Shootout live" : "Round locks in"}
-          </div>
-          {live ? (
-            <div className="flex items-center gap-2 text-destructive font-black">
-              <Radio className="h-5 w-5 animate-pulse" />
-              <span className="text-lg">In progress</span>
-            </div>
-          ) : (
-            <>
-              <div className="text-3xl sm:text-4xl font-black tabular-nums gradient-gold-text leading-none">
-                {cd.mm}:{cd.ss}
-              </div>
-              <div className="mt-2 h-1.5 rounded-full bg-background overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-amber-500 to-primary transition-all"
-                  style={{ width: `${Math.min(100, 100 - (cd.secs / Math.max(1, cd.secs + 1)) * 0)}%` }}
-                />
-              </div>
-            </>
-          )}
-          <div className="mt-2 text-[10px] text-muted-foreground truncate">
-            {home} vs {away}
-          </div>
-        </Card>
-
+      {/* Previous scores */}
+      <div className="grid grid-cols-1 gap-3">
         <Card className="virtual-panel p-3">
           <div className="text-[10px] font-black uppercase tracking-[0.25em] text-primary/80 mb-2">
             Previous scores
