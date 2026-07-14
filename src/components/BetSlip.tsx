@@ -151,7 +151,7 @@ function BetSlipDrawer({ open, onClose }: { open: boolean; onClose: () => void }
     const ok = await confirm({
       title: "Confirm bet placement",
       description: `Stake ${stake.toLocaleString()} on ${selections.length} selection(s) at total odds ${totalOdds.toFixed(2)}. Potential payout: ${payout.toLocaleString()} tokens${capped ? ` (capped at max ${maxPayout.toLocaleString()})` : ""}. Tokens will be deducted immediately.`,
-      confirmText: "Place Bet",
+      confirmText: "Stake Bet",
     });
     if (!ok) return;
 
@@ -295,7 +295,7 @@ function BetSlipDrawer({ open, onClose }: { open: boolean; onClose: () => void }
             )}
             <div className="flex gap-2">
               <Button variant="outline" onClick={clear} className="flex-1"><Trash2 className="h-4 w-4 mr-1" />Clear</Button>
-              <Button className="btn-luxury flex-1" disabled={submitting || (!isVirtualTicket && !isFutureTicket && selections.length < 2)} onClick={place}>{submitting ? "Placing…" : `Place Bet${(!isVirtualTicket && !isFutureTicket && selections.length < 2) ? ` (need ${2 - selections.length} more)` : ""}`}</Button>
+              <Button className="btn-luxury flex-1" disabled={submitting || (!isVirtualTicket && !isFutureTicket && selections.length < 2)} onClick={place}>{submitting ? "Staking…" : `Stake Bet${(!isVirtualTicket && !isFutureTicket && selections.length < 2) ? ` (need ${2 - selections.length} more)` : ""}`}</Button>
             </div>
             <p className="text-[10px] text-muted-foreground text-center">{isFutureTicket ? `Futures tickets can hold up to ${futureMaxSel} selection${futureMaxSel === 1 ? "" : "s"}. Tokens are deducted on placement and paid after admin settlement.` : "Minimum 2 selections required. Tokens are deducted on placement. Cash-out available only after the match ends and your bet wins."}</p>
           </div>
