@@ -33,23 +33,24 @@ function VirtualHubPage() {
 
   useEffect(() => {
     (async () => {
+      const sb = supabase as any;
       const [{ data: s }, { count: liveCount }, { data: t }] = await Promise.all([
-        supabase
+        sb
           .from("app_settings")
           .select("virtual_cycle_running,virtual_championship_enabled")
           .eq("id", 1)
           .maybeSingle(),
-        supabase
+        sb
           .from("matches")
           .select("id", { count: "exact", head: true })
           .eq("is_virtual", true)
           .eq("status", "live"),
-        supabase
-          .from("tournaments" as any)
+        sb
+          .from("tournaments")
           .select("starts_at,status")
-          .eq("kind" as any, "championship_virtual")
-          .in("status" as any, ["scheduled", "live"])
-          .order("starts_at" as any, { ascending: true })
+          .eq("kind", "championship_virtual")
+          .in("status", ["scheduled", "live"])
+          .order("starts_at", { ascending: true })
           .limit(1)
           .maybeSingle(),
       ]);
