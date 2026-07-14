@@ -1335,6 +1335,7 @@ export type Database = {
           image_url: string
           is_active: boolean
           link_url: string
+          placement: string
           sort_order: number
           subtitle: string
           title: string
@@ -1348,6 +1349,7 @@ export type Database = {
           image_url: string
           is_active?: boolean
           link_url?: string
+          placement?: string
           sort_order?: number
           subtitle?: string
           title?: string
@@ -1361,6 +1363,7 @@ export type Database = {
           image_url?: string
           is_active?: boolean
           link_url?: string
+          placement?: string
           sort_order?: number
           subtitle?: string
           title?: string

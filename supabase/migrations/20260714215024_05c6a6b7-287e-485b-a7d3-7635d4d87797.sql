@@ -1,0 +1,2 @@
+ALTER TABLE public.home_banners ADD COLUMN IF NOT EXISTS placement text NOT NULL DEFAULT 'home';
+CREATE INDEX IF NOT EXISTS home_banners_placement_idx ON public.home_banners(placement, is_active, sort_order);
