@@ -43,6 +43,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VirtualInstantRouteImport } from './routes/virtual.instant'
 import { Route as VirtualHistoryRouteImport } from './routes/virtual.history'
 import { Route as TicketIdRouteImport } from './routes/ticket.$id'
 import { Route as MatchesMatchIdRouteImport } from './routes/matches.$matchId'
@@ -221,6 +222,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VirtualInstantRoute = VirtualInstantRouteImport.update({
+  id: '/instant',
+  path: '/instant',
+  getParentRoute: () => VirtualRoute,
+} as any)
 const VirtualHistoryRoute = VirtualHistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -297,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/ticket/$id': typeof TicketIdRoute
   '/virtual/history': typeof VirtualHistoryRoute
+  '/virtual/instant': typeof VirtualInstantRoute
   '/api/public/virtual-tick': typeof ApiPublicVirtualTickRoute
   '/api/public/hooks/broadcast-push': typeof ApiPublicHooksBroadcastPushRoute
   '/api/public/hooks/process-scheduled-push': typeof ApiPublicHooksProcessScheduledPushRoute
@@ -340,6 +347,7 @@ export interface FileRoutesByTo {
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/ticket/$id': typeof TicketIdRoute
   '/virtual/history': typeof VirtualHistoryRoute
+  '/virtual/instant': typeof VirtualInstantRoute
   '/api/public/virtual-tick': typeof ApiPublicVirtualTickRoute
   '/api/public/hooks/broadcast-push': typeof ApiPublicHooksBroadcastPushRoute
   '/api/public/hooks/process-scheduled-push': typeof ApiPublicHooksProcessScheduledPushRoute
@@ -384,6 +392,7 @@ export interface FileRoutesById {
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/ticket/$id': typeof TicketIdRoute
   '/virtual/history': typeof VirtualHistoryRoute
+  '/virtual/instant': typeof VirtualInstantRoute
   '/api/public/virtual-tick': typeof ApiPublicVirtualTickRoute
   '/api/public/hooks/broadcast-push': typeof ApiPublicHooksBroadcastPushRoute
   '/api/public/hooks/process-scheduled-push': typeof ApiPublicHooksProcessScheduledPushRoute
@@ -429,6 +438,7 @@ export interface FileRouteTypes {
     | '/matches/$matchId'
     | '/ticket/$id'
     | '/virtual/history'
+    | '/virtual/instant'
     | '/api/public/virtual-tick'
     | '/api/public/hooks/broadcast-push'
     | '/api/public/hooks/process-scheduled-push'
@@ -472,6 +482,7 @@ export interface FileRouteTypes {
     | '/matches/$matchId'
     | '/ticket/$id'
     | '/virtual/history'
+    | '/virtual/instant'
     | '/api/public/virtual-tick'
     | '/api/public/hooks/broadcast-push'
     | '/api/public/hooks/process-scheduled-push'
@@ -515,6 +526,7 @@ export interface FileRouteTypes {
     | '/matches/$matchId'
     | '/ticket/$id'
     | '/virtual/history'
+    | '/virtual/instant'
     | '/api/public/virtual-tick'
     | '/api/public/hooks/broadcast-push'
     | '/api/public/hooks/process-scheduled-push'
@@ -803,6 +815,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/virtual/instant': {
+      id: '/virtual/instant'
+      path: '/instant'
+      fullPath: '/virtual/instant'
+      preLoaderRoute: typeof VirtualInstantRouteImport
+      parentRoute: typeof VirtualRoute
+    }
     '/virtual/history': {
       id: '/virtual/history'
       path: '/history'
@@ -868,10 +887,12 @@ const MatchesRouteWithChildren =
 
 interface VirtualRouteChildren {
   VirtualHistoryRoute: typeof VirtualHistoryRoute
+  VirtualInstantRoute: typeof VirtualInstantRoute
 }
 
 const VirtualRouteChildren: VirtualRouteChildren = {
   VirtualHistoryRoute: VirtualHistoryRoute,
+  VirtualInstantRoute: VirtualInstantRoute,
 }
 
 const VirtualRouteWithChildren =

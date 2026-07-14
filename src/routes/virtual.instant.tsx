@@ -36,7 +36,7 @@ type VirtualSettings = {
 type CycleState = { running: boolean; animSec: number; durSec: number; perRound: number; maxScore: number };
 type Phase = "idle" | "pre" | "live";
 
-export const Route = createFileRoute("/virtual")({
+export const Route = createFileRoute("/virtual/instant")({
   head: () => ({
     meta: [
       { title: "Virtual Gang League — Instant Shootouts | LSL" },
