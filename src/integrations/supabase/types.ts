@@ -133,6 +133,13 @@ export type Database = {
           nav_bg_fit: string | null
           nav_bg_position: string | null
           nav_bg_url: string | null
+          platform_description: string | null
+          platform_logo_auth_url: string | null
+          platform_logo_url: string | null
+          platform_logo_voucher_url: string | null
+          platform_name: string | null
+          platform_og_image_url: string | null
+          platform_tagline: string | null
           polls_enabled: boolean | null
           popup_ad_active: boolean
           popup_ad_image: string | null
@@ -255,6 +262,13 @@ export type Database = {
           nav_bg_fit?: string | null
           nav_bg_position?: string | null
           nav_bg_url?: string | null
+          platform_description?: string | null
+          platform_logo_auth_url?: string | null
+          platform_logo_url?: string | null
+          platform_logo_voucher_url?: string | null
+          platform_name?: string | null
+          platform_og_image_url?: string | null
+          platform_tagline?: string | null
           polls_enabled?: boolean | null
           popup_ad_active?: boolean
           popup_ad_image?: string | null
@@ -377,6 +391,13 @@ export type Database = {
           nav_bg_fit?: string | null
           nav_bg_position?: string | null
           nav_bg_url?: string | null
+          platform_description?: string | null
+          platform_logo_auth_url?: string | null
+          platform_logo_url?: string | null
+          platform_logo_voucher_url?: string | null
+          platform_name?: string | null
+          platform_og_image_url?: string | null
+          platform_tagline?: string | null
           polls_enabled?: boolean | null
           popup_ad_active?: boolean
           popup_ad_image?: string | null
@@ -4152,6 +4173,7 @@ export type Database = {
       }
       play_scratch: { Args: never; Returns: Json }
       play_wheel: { Args: { _stake: number }; Returns: Json }
+      prune_dead_push_subscriptions: { Args: never; Returns: number }
       public_profiles: {
         Args: { _ids?: string[] }
         Returns: {
