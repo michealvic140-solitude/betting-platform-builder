@@ -337,7 +337,7 @@ function FeaturedGoldenMatches({ matches, bgImage, bgFit, bgPos }: { matches: Ma
   const { selections, add, remove, setOpen } = useBetSlip();
   if (matches.length === 0) return null;
   return (
-    <div className="seasonal-golden relative overflow-hidden rounded-3xl px-4 py-4 md:px-6 md:py-5 space-y-3">
+    <div className={`seasonal-golden relative overflow-hidden rounded-3xl px-4 py-4 md:px-6 md:py-5 space-y-3 ${bgImage ? "min-h-[420px] md:min-h-[500px]" : ""}`}>
       {bgImage && (
         <>
           <img
@@ -347,7 +347,7 @@ function FeaturedGoldenMatches({ matches, bgImage, bgFit, bgPos }: { matches: Ma
             className="absolute inset-0 h-full w-full"
             style={{ objectFit: (bgFit as any) || "cover", objectPosition: bgPos || "center" }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
         </>
       )}
       <div className="relative flex items-center gap-2">
@@ -386,7 +386,7 @@ function FeaturedGoldenMatches({ matches, bgImage, bgFit, bgPos }: { matches: Ma
               {m.away_team && <TeamLogo name={m.away_team?.name} url={m.away_team?.logo_url} size={30} rounded="full" />}
             </Link>
             {odds.length > 0 && (
-              <div className="grid gap-px px-3 pb-3" style={{ gridTemplateColumns: `repeat(${Math.min(odds.length, 3)}, minmax(0,1fr))` }}>
+              <div className="grid gap-2 px-3 pb-3" style={{ gridTemplateColumns: `repeat(${Math.min(odds.length, 3)}, minmax(0,1fr))` }}>
                 {odds.slice(0, 3).map((o) => {
                   const selected = selections.some((s) => s.odd_id === o.id);
                   const blocked = !market?.is_open || m.status === "ended";
@@ -400,10 +400,14 @@ function FeaturedGoldenMatches({ matches, bgImage, bgFit, bgPos }: { matches: Ma
                         add({ match_id: m.id, match_name: m.name, market_id: market!.id, market_name: market!.name, odd_id: o.id, selection_label: o.label, odds: Number(o.value) });
                         setOpen(true);
                       }}
-                      className={`flex flex-col items-center justify-center gap-0.5 rounded-lg bg-black/40 py-2 px-1 transition hover:bg-amber-400/15 disabled:opacity-40 disabled:hover:bg-black/40 ${selected ? "ring-2 ring-amber-300 bg-amber-400/20" : "border border-amber-300/15"}`}
+                      className={`flex flex-col items-center justify-center gap-1 rounded-xl py-3.5 px-2 min-h-[64px] backdrop-blur-md transition shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_6px_18px_-8px_rgba(0,0,0,0.7)] disabled:opacity-40 ${
+                        selected
+                          ? "bg-emerald-500/30 border-2 border-emerald-300 ring-2 ring-emerald-300/60 text-emerald-50"
+                          : "bg-emerald-950/70 border-2 border-emerald-600/60 hover:bg-emerald-800/70 hover:border-emerald-400/80 text-emerald-50"
+                      }`}
                     >
-                      <span className="text-[9px] uppercase tracking-wider text-amber-100/70 truncate max-w-full">{o.label}</span>
-                      <span className="font-mono font-black text-amber-200">{Number(o.value).toFixed(2)}</span>
+                      <span className="text-[10px] uppercase tracking-widest font-bold text-emerald-100/80 truncate max-w-full">{o.label}</span>
+                      <span className="font-mono font-black text-lg text-emerald-50 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">{Number(o.value).toFixed(2)}</span>
                     </button>
                   );
                 })}
