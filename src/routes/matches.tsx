@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { MatchCardLive } from "@/components/MatchCardLive";
+import { HomeBannerSlider } from "@/components/HomeBannerSlider";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { fetchMatches, type MatchRow } from "@/lib/queries";
 import { Crosshair } from "lucide-react";
@@ -50,6 +51,9 @@ function MatchesPage() {
 
   return (
     <Layout>
+      <section className="container mt-4">
+        <HomeBannerSlider embedded placement="matches" />
+      </section>
       <div className="container py-10">
         <div className="flex items-center gap-2 mb-6">
           <Crosshair className="h-7 w-7 text-primary" />
