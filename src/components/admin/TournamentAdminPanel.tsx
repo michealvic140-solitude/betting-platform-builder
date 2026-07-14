@@ -296,12 +296,33 @@ export function TournamentAdminPanel() {
 
           {tournaments.length > 0 && (
             <div className="pt-2 space-y-1">
-              <Label className="text-xs text-muted-foreground">Select tournament to manage</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label className="text-xs text-muted-foreground">Select tournament to manage</Label>
+                {selectedTournaments.size > 0 && (
+                  <Button size="sm" variant="destructive" className="h-6 text-[10px]" onClick={async () => {
+                    const n = selectedTournaments.size;
+                    if (!window.confirm(`Delete ${n} tournament${n === 1 ? "" : "s"}? Their brackets, participants and results will be permanently removed.`)) return;
+                    const ids = Array.from(selectedTournaments);
+                    await (supabase as any).from("tournament_matches").delete().in("tournament_id", ids);
+                    await (supabase as any).from("tournament_participants").delete().in("tournament_id", ids);
+                    const { error } = await (supabase as any).from("tournaments").delete().in("id", ids);
+                    if (error) { toast.error(error.message); return; }
+                    toast.success(`Deleted ${n} tournament${n === 1 ? "" : "s"}`);
+                    if (selId && selectedTournaments.has(selId)) setSelId(null);
+                    loadTournaments();
+                  }}>
+                    <Trash2 className="h-3 w-3 mr-1" />Delete ({selectedTournaments.size})
+                  </Button>
+                )}
+              </div>
               <div className="flex flex-col gap-1 max-h-40 overflow-y-auto">
                 {tournaments.map((t) => (
-                  <button key={t.id} onClick={() => setSelId(t.id)} className={`text-left rounded-md px-3 py-2 text-sm border ${selId === t.id ? "border-primary bg-primary/10" : "border-border"}`}>
-                    <span className="font-bold">{t.name}</span> <Badge variant="outline" className="ml-1 text-[9px] capitalize">{t.status}</Badge>
-                  </button>
+                  <div key={t.id} className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm border ${selId === t.id ? "border-primary bg-primary/10" : "border-border"}`}>
+                    <input type="checkbox" checked={selectedTournaments.has(t.id)} onChange={() => setSelectedTournaments((s) => { const n = new Set(s); n.has(t.id) ? n.delete(t.id) : n.add(t.id); return n; })} />
+                    <button onClick={() => setSelId(t.id)} className="text-left flex-1 min-w-0">
+                      <span className="font-bold">{t.name}</span> <Badge variant="outline" className="ml-1 text-[9px] capitalize">{t.status}</Badge>
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
