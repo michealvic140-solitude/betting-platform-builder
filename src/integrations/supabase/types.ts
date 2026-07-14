@@ -616,9 +616,9 @@ export type Database = {
           created_at: string
           id: string
           locked_odds: number
-          market_id: string
+          market_id: string | null
           match_id: string | null
-          odd_id: string
+          odd_id: string | null
           result: string | null
           selection_label: string
         }
@@ -627,9 +627,9 @@ export type Database = {
           created_at?: string
           id?: string
           locked_odds: number
-          market_id: string
+          market_id?: string | null
           match_id?: string | null
-          odd_id: string
+          odd_id?: string | null
           result?: string | null
           selection_label: string
         }
@@ -638,9 +638,9 @@ export type Database = {
           created_at?: string
           id?: string
           locked_odds?: number
-          market_id?: string
+          market_id?: string | null
           match_id?: string | null
-          odd_id?: string
+          odd_id?: string | null
           result?: string | null
           selection_label?: string
         }
@@ -687,8 +687,12 @@ export type Database = {
           booking_code: string
           cashed_out_at: string | null
           cashout_amount: number | null
+          championship_bet_id: string | null
           created_at: string
           id: string
+          is_virtual: boolean
+          kind: string
+          meta: Json | null
           potential_payout: number
           settled_at: string | null
           stake: number
@@ -696,13 +700,18 @@ export type Database = {
           total_odds: number
           tracking_id: string
           user_id: string
+          virtual_round_id: string | null
         }
         Insert: {
           booking_code?: string
           cashed_out_at?: string | null
           cashout_amount?: number | null
+          championship_bet_id?: string | null
           created_at?: string
           id?: string
+          is_virtual?: boolean
+          kind?: string
+          meta?: Json | null
           potential_payout: number
           settled_at?: string | null
           stake: number
@@ -710,13 +719,18 @@ export type Database = {
           total_odds: number
           tracking_id?: string
           user_id: string
+          virtual_round_id?: string | null
         }
         Update: {
           booking_code?: string
           cashed_out_at?: string | null
           cashout_amount?: number | null
+          championship_bet_id?: string | null
           created_at?: string
           id?: string
+          is_virtual?: boolean
+          kind?: string
+          meta?: Json | null
           potential_payout?: number
           settled_at?: string | null
           stake?: number
@@ -724,13 +738,28 @@ export type Database = {
           total_odds?: number
           tracking_id?: string
           user_id?: string
+          virtual_round_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "bets_championship_bet_id_fkey"
+            columns: ["championship_bet_id"]
+            isOneToOne: false
+            referencedRelation: "championship_bets"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "bets_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bets_virtual_round_id_fkey"
+            columns: ["virtual_round_id"]
+            isOneToOne: false
+            referencedRelation: "user_virtual_rounds"
             referencedColumns: ["id"]
           },
         ]
