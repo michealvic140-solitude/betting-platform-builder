@@ -362,7 +362,7 @@ function FeaturedGoldenMatches({ matches, bgImage, bgFit, bgPos }: { matches: Ma
         const odds = market?.odds ?? [];
         const live = m.status === "live";
         return (
-          <div key={m.id} className="rounded-2xl border border-amber-300/40 bg-black/25 overflow-hidden shadow-[0_8px_30px_-12px_rgba(0,0,0,0.7)]">
+          <div key={m.id} className="relative rounded-2xl border border-amber-300/40 bg-black/25 overflow-hidden shadow-[0_8px_30px_-12px_rgba(0,0,0,0.7)]">
             <div className="flex items-center justify-between gap-2 px-3 pt-2.5 text-[10px] uppercase tracking-widest">
               <span className="inline-flex items-center gap-1.5 font-black text-amber-200">
                 {live ? (
