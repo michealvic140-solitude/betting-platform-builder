@@ -15,6 +15,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocation } from "@tanstack/react-router";
 import lslPlatformBg from "@/assets/lsl-bg-nebula.png.asset.json";
+import { useBranding } from "@/lib/branding";
 
 // Site-wide background ticker so virtual rounds keep advancing even when
 // no one is on /virtual. Any authenticated client pings every 15s.
@@ -58,6 +59,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
   useVirtualHeartbeat();
   useForceReloadBroadcast();
   const [railOpen, setRailOpen] = useState(false);
+  const branding = useBranding();
   // Admin-configurable site-wide background + branding (fall back to bundled art).
   const [siteBg, setSiteBg] = useState<string | null>(null);
   const [bgFit, setBgFit] = useState<string>("cover");
