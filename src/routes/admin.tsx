@@ -4126,7 +4126,11 @@ function BetTrackerPanel() {
     let qb = supabase.from("bets")
       .select("*, profiles!user_id(full_name,email,ingame_name), bet_selections(*, matches!match_id(name))")
       .order("created_at", { ascending: false }).limit(200);
-    if (filter !== "all") qb = qb.eq("status", filter as any);
+    if (filter === "virtual") qb = qb.eq("is_virtual", true);
+    else if (filter === "real") qb = qb.eq("is_virtual", false);
+    else if (filter === "championship") qb = qb.eq("kind", "championship");
+    else if (filter === "football_instant") qb = qb.eq("kind", "virtual_football_instant");
+    else if (filter !== "all") qb = qb.eq("status", filter as any);
     const { data } = await qb;
     setBets(data ?? []);
     setSelectedBets(new Set());
