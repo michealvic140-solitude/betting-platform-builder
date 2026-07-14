@@ -709,31 +709,19 @@ function ClaimVirtualPayoutButton({ betId }: { betId: string }) {
     });
     if (!ok) return;
     setBusy(true);
-    // find the payout request id for this bet
-    const { data: vpr } = await supabase
-      .from("virtual_payout_requests")
-      .select("id,status")
-      .eq("bet_id", betId)
-      .maybeSingle();
-    if (!vpr?.id) {
-      setBusy(false);
-      toast.error("No payout request found for this ticket.");
-      return;
-    }
-    if (vpr.status === "claimed") {
-      setBusy(false);
-      setClaimed(true);
-      toast.info("Already claimed.");
-      return;
-    }
-    const { data, error } = await (supabase as any).rpc("claim_virtual_payout", { _id: vpr.id });
+    // Unified claim: auto-credits from the virtual wallet if funded, otherwise
+    // creates a pending payout request that auto-settles once the wallet is funded.
+    const { data, error } = await (supabase as any).rpc("user_claim_or_settle_virtual", { _bet_id: betId });
     setBusy(false);
     if (error) {
       const msg = String(error.message || "").toLowerCase();
-      if (msg.includes("insufficient")) {
+      if (msg.includes("already claimed")) {
+        setClaimed(true);
+        toast.info("Already claimed.");
+      } else if (msg.includes("insufficient")) {
         toast.error("Virtual house wallet is empty", {
           description:
-            "Payout is paused until the wallet is funded. It will be available automatically once funds are added.",
+            "A pending payout request has been created. It will settle automatically once the wallet is funded.",
         });
       } else {
         toast.error("Claim failed", { description: error.message });

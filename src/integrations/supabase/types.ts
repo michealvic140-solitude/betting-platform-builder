@@ -4358,6 +4358,7 @@ export type Database = {
         Returns: Json
       }
       user_cashout_bet: { Args: { _bet_id: string }; Returns: Json }
+      user_claim_or_settle_virtual: { Args: { _bet_id: string }; Returns: Json }
       verify_xp_consistency: { Args: { _user_id?: string }; Returns: Json }
       virtual_half_score_for_match: {
         Args: { _match_id: string; _max_score?: number }
