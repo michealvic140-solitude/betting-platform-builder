@@ -84,6 +84,13 @@ export function ChampionshipAdminPanel() {
     toast.success("Cancelled"); load();
   }
 
+  async function startNow(id: string) {
+    const { error } = await sb.rpc("championship_start", { p_tournament: id });
+    if (error) return toast.error(error.message);
+    toast.success("Bracket drawn — tournament live");
+    load();
+  }
+
   return (
     <div className="space-y-4">
       <Card className="glass p-5 border-primary/30">
@@ -165,6 +172,9 @@ export function ChampionshipAdminPanel() {
                     {t.status === "live" ? <Radio className="h-3 w-3 mr-1 animate-pulse" /> : null}
                     {(t.status ?? "draft").toUpperCase()}
                   </Badge>
+                  {t.status === "scheduled" && (
+                    <Button variant="outline" size="sm" onClick={() => startNow(t.id)}>Start now</Button>
+                  )}
                   {t.status !== "completed" && t.status !== "cancelled" && (
                     <Button variant="ghost" size="sm" onClick={() => cancel(t.id)}><X className="h-3.5 w-3.5" /></Button>
                   )}
