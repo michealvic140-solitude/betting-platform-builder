@@ -17,6 +17,8 @@ export function HomeBannersAdminPanel() {
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [image, setImage] = useState<string | null>(null);
+  const [imageFit, setImageFit] = useState<string>("cover");
+  const [imagePosition, setImagePosition] = useState<string>("center");
   const [link, setLink] = useState("/matches");
   const [cta, setCta] = useState("Click here");
   const [placement, setPlacement] = useState<"home" | "matches">("home");
@@ -35,13 +37,14 @@ export function HomeBannersAdminPanel() {
       title: title.trim(), subtitle: subtitle.trim(), image_url: image,
       link_url: link.trim() || "/", cta_label: cta.trim() || "Click here",
       is_active: true, sort_order: items.length, created_by: user?.id ?? null,
-      placement,
+      placement, image_fit: imageFit, image_position: imagePosition,
     }).select("id").maybeSingle();
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success(`Banner published to the ${placement} page`);
     logAudit("banner_create", "home_banner", inserted?.id, { placement, title: title.trim(), link_url: link.trim() });
     setTitle(""); setSubtitle(""); setImage(null); setLink("/matches"); setCta("Click here");
+    setImageFit("cover"); setImagePosition("center");
     load();
   }
   async function toggle(b: any) {
@@ -82,7 +85,17 @@ export function HomeBannersAdminPanel() {
             <option value="matches">Matches page</option>
           </select>
         </div>
-        <ImageSettingControl label="Banner image" value={image} onChange={setImage} showFitControls={false} aspect="16 / 5" help="Wide image works best (e.g. 1600×500)." />
+        <ImageSettingControl
+          label="Banner image"
+          value={image}
+          onChange={setImage}
+          fit={imageFit}
+          onFitChange={setImageFit}
+          position={imagePosition}
+          onPositionChange={setImagePosition}
+          aspect="16 / 5"
+          help="Wide image works best (e.g. 1600×500). Use Crop/fit + Position to control how it frames."
+        />
         <div className="grid gap-2 sm:grid-cols-2">
           <Input placeholder="Headline (optional)" value={title} onChange={(e) => setTitle(e.target.value)} />
           <Input placeholder='CTA label (e.g. "Click here")' value={cta} onChange={(e) => setCta(e.target.value)} />
