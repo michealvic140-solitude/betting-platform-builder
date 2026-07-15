@@ -223,23 +223,23 @@ export const Layout = ({ children }: { children: ReactNode }) => {
             </span>
             <span className="leading-none text-[9px]">{railOpen ? "Less" : "More"}</span>
           </button>
-          <MobLink to="/" icon={Home} label="Home" color="text-sky-400" />
+          <MobLink to="/" icon={Home} label="Home" />
           {railOpen && <>
-          <MobLink to="/matches" icon={MatchIcon} label="Matches" color="text-emerald-400" />
-          <MobLink to="/virtual" icon={Dice5} label="Virtual" color="text-fuchsia-400" />
-          <MobLink to="/lottery" icon={Clover} label="Lottery" color="text-lime-400" />
-          <MobLink to="/arcade" icon={Gamepad2} label="Arcade" color="text-pink-400" />
-          <MobLink to="/leaderboard" icon={Trophy} label="Top" color="text-amber-400" />
-          <MobLink to="/tournament" icon={Swords} label="Bracket" color="text-orange-400" />
+          <MobLink to="/matches" icon={MatchIcon} label="Matches" />
+          <MobLink to="/virtual" icon={Dice5} label="Virtual" />
+          <MobLink to="/lottery" icon={Clover} label="Lottery" />
+          <MobLink to="/arcade" icon={Gamepad2} label="Arcade" />
+          <MobLink to="/leaderboard" icon={Trophy} label="Top" />
+          <MobLink to="/tournament" icon={Swords} label="Bracket" />
           {user && <>
-            <MobLink to="/dashboard" icon={Ticket} label="ME" color="text-yellow-400" />
-            <MobLink to="/tasks" icon={ListChecks} label="Tasks" color="text-cyan-400" />
-            <MobLink to="/profile" icon={UserIcon} label="Profile" color="text-violet-400" />
-            <MobLink to="/settings" icon={SettingsIcon} label="Settings" color="text-teal-400" />
-            <MobLink to="/support" icon={LifeBuoy} label="Help" color="text-rose-400" />
+            <MobLink to="/dashboard" icon={Ticket} label="ME" />
+            <MobLink to="/tasks" icon={ListChecks} label="Tasks" />
+            <MobLink to="/profile" icon={UserIcon} label="Profile" />
+            <MobLink to="/settings" icon={SettingsIcon} label="Settings" />
+            <MobLink to="/support" icon={LifeBuoy} label="Help" />
           </>}
-          {isAdmin && <MobLink to="/admin" icon={Shield} label="Admin" color="text-red-400" />}
-          {!isAdmin && isMod && <MobLink to="/mod" icon={Shield} label="Mod" color="text-red-400" />}
+          {isAdmin && <MobLink to="/admin" icon={Shield} label="Admin" danger />}
+          {!isAdmin && isMod && <MobLink to="/mod" icon={Shield} label="Mod" danger />}
           </>}
         </div>
       </nav>
@@ -297,42 +297,56 @@ function SiteFooter({ isHome = false }: { isHome?: boolean }) {
   );
 }
 
-function MobLink({ to, icon: Icon, label, badge, color }: { to: string; icon: any; label: string; badge?: number; color?: string }) {
+function MobLink({ to, icon: Icon, label, badge, danger }: { to: string; icon: any; label: string; badge?: number; danger?: boolean }) {
   return (
     <Link
       to={to}
       activeProps={{ className: "active" }}
-      className={`group relative flex flex-col items-center justify-center gap-1 px-0 py-1 rounded-xl text-[10px] font-semibold tracking-wide ${color ?? "text-muted-foreground"} transition-all duration-200 hover:brightness-125 hover:-translate-y-[1px] active:scale-95`}
+      className={`group relative flex flex-col items-center justify-center gap-1.5 px-0 py-1 rounded-xl text-[10px] font-semibold tracking-wide transition-all duration-300 active:scale-95
+        ${danger ? "text-destructive/85 hover:text-destructive [&.active]:text-destructive" : "text-foreground/55 hover:text-primary [&.active]:text-primary"}`}
       title={label}
     >
-      <span className="pointer-events-none absolute -left-1.5 inset-y-2 w-[3px] rounded-full bg-gradient-to-b from-transparent via-current to-transparent opacity-0 group-[.active]:opacity-100 transition-opacity shadow-[0_0_10px_currentColor]" />
+      {/* left rail active indicator — thin gold line */}
+      <span className="pointer-events-none absolute -left-1.5 inset-y-3 w-[2px] rounded-full bg-gradient-to-b from-transparent via-primary to-transparent opacity-0 group-[.active]:opacity-100 transition-opacity duration-500 shadow-[0_0_8px_hsl(var(--primary))]" />
       <span
-        className="relative grid place-items-center h-[52px] w-[52px] rounded-2xl transition-all
-          border border-white/10 group-hover:border-white/25
-          bg-[linear-gradient(160deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02)_45%,rgba(0,0,0,0.35))]
-          shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-8px_18px_-10px_rgba(0,0,0,0.7),0_6px_18px_-10px_rgba(0,0,0,0.9)]
-          group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_0_18px_-4px_currentColor,0_8px_22px_-10px_currentColor]
-          group-[.active]:border-current
-          group-[.active]:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_0_22px_-2px_currentColor,0_10px_26px_-10px_currentColor]"
+        className="relative grid place-items-center h-[50px] w-[50px] rounded-[14px] transition-all duration-300
+          border border-white/[0.06] group-hover:border-primary/40 group-[.active]:border-primary/70
+          bg-[linear-gradient(155deg,rgba(30,26,22,0.9)_0%,rgba(14,12,10,0.95)_50%,rgba(8,7,6,1)_100%)]
+          shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-1px_0_rgba(0,0,0,0.6),0_2px_10px_-2px_rgba(0,0,0,0.8)]
+          group-hover:shadow-[inset_0_1px_0_rgba(212,175,55,0.25),inset_0_-1px_0_rgba(0,0,0,0.6),0_4px_18px_-4px_rgba(212,175,55,0.35)]
+          group-[.active]:shadow-[inset_0_1px_0_rgba(212,175,55,0.4),inset_0_-1px_0_rgba(0,0,0,0.6),0_6px_22px_-4px_rgba(212,175,55,0.55)]"
       >
+        {/* engraved bevel */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-2xl opacity-70 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity"
-          style={{ background: "radial-gradient(75% 60% at 50% 0%, color-mix(in oklab, currentColor 35%, transparent), transparent 70%)" }}
+          className="pointer-events-none absolute inset-[1px] rounded-[13px] opacity-60"
+          style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.35) 100%)" }}
         />
+        {/* top gloss highlight */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-[.active]:opacity-100 transition-opacity"
-          style={{ background: "radial-gradient(80% 80% at 50% 120%, color-mix(in oklab, currentColor 45%, transparent), transparent 70%)" }}
+          className="pointer-events-none absolute inset-x-2 top-[2px] h-[10px] rounded-full opacity-60"
+          style={{ background: "radial-gradient(60% 100% at 50% 0%, rgba(255,255,255,0.18), transparent 70%)" }}
         />
-        <Icon className="relative h-7 w-7 transition-transform group-hover:scale-105 group-[.active]:scale-110 drop-shadow-[0_0_6px_currentColor]" fill="currentColor" strokeWidth={1.25} />
+        {/* gold ring on hover/active */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-[14px] opacity-0 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity duration-500"
+          style={{ background: "radial-gradient(85% 70% at 50% 50%, transparent 55%, rgba(212,175,55,0.12) 78%, transparent 100%)" }}
+        />
+        <Icon
+          className="relative h-[22px] w-[22px] transition-all duration-300 group-hover:scale-110 group-[.active]:scale-110"
+          strokeWidth={1.6}
+        />
         {badge && badge > 0 ? (
-          <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-black grid place-items-center ring-2 ring-card animate-pulse">
+          <span className="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-gradient-to-b from-destructive to-destructive/70 text-destructive-foreground text-[9px] font-black grid place-items-center ring-2 ring-background shadow-[0_2px_8px_rgba(220,38,38,0.5)] animate-pulse">
             {badge > 9 ? "9+" : badge}
           </span>
         ) : null}
       </span>
-      <span className="leading-none text-[9px] truncate max-w-[56px] uppercase tracking-[0.12em] font-bold drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]">{label}</span>
+      <span className="leading-none text-[8.5px] truncate max-w-[56px] uppercase tracking-[0.18em] font-bold text-foreground/60 group-hover:text-foreground/90 group-[.active]:text-primary transition-colors">
+        {label}
+      </span>
     </Link>
   );
 }
