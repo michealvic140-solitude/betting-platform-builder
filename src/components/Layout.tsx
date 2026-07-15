@@ -302,19 +302,37 @@ function MobLink({ to, icon: Icon, label, badge, color }: { to: string; icon: an
     <Link
       to={to}
       activeProps={{ className: "active" }}
-      className={`group relative flex flex-col items-center justify-center gap-1 px-0 py-1 rounded-xl text-[10px] font-semibold tracking-wide ${color ?? "text-muted-foreground"} transition-all duration-200 hover:brightness-125 active:scale-95`}
+      className={`group relative flex flex-col items-center justify-center gap-1 px-0 py-1 rounded-xl text-[10px] font-semibold tracking-wide ${color ?? "text-muted-foreground"} transition-all duration-200 hover:brightness-125 hover:-translate-y-[1px] active:scale-95`}
       title={label}
     >
-      <span className="pointer-events-none absolute left-0 inset-y-2 w-[2px] rounded-full bg-gradient-to-b from-transparent via-primary to-transparent opacity-0 group-[.active]:opacity-100 transition-opacity" />
-      <span className="relative grid place-items-center h-[52px] w-[52px] rounded-xl transition-all bg-white/5 group-[.active]:bg-white/15 group-[.active]:shadow-[0_0_18px_-4px_currentColor]">
-        <Icon className="h-7 w-7 transition-transform group-[.active]:scale-110" fill="currentColor" strokeWidth={1.25} />
+      <span className="pointer-events-none absolute -left-1.5 inset-y-2 w-[3px] rounded-full bg-gradient-to-b from-transparent via-current to-transparent opacity-0 group-[.active]:opacity-100 transition-opacity shadow-[0_0_10px_currentColor]" />
+      <span
+        className="relative grid place-items-center h-[52px] w-[52px] rounded-2xl transition-all
+          border border-white/10 group-hover:border-white/25
+          bg-[linear-gradient(160deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02)_45%,rgba(0,0,0,0.35))]
+          shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-8px_18px_-10px_rgba(0,0,0,0.7),0_6px_18px_-10px_rgba(0,0,0,0.9)]
+          group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_0_18px_-4px_currentColor,0_8px_22px_-10px_currentColor]
+          group-[.active]:border-current
+          group-[.active]:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_0_22px_-2px_currentColor,0_10px_26px_-10px_currentColor]"
+      >
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-2xl opacity-70 group-hover:opacity-100 group-[.active]:opacity-100 transition-opacity"
+          style={{ background: "radial-gradient(75% 60% at 50% 0%, color-mix(in oklab, currentColor 35%, transparent), transparent 70%)" }}
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-[.active]:opacity-100 transition-opacity"
+          style={{ background: "radial-gradient(80% 80% at 50% 120%, color-mix(in oklab, currentColor 45%, transparent), transparent 70%)" }}
+        />
+        <Icon className="relative h-7 w-7 transition-transform group-hover:scale-105 group-[.active]:scale-110 drop-shadow-[0_0_6px_currentColor]" fill="currentColor" strokeWidth={1.25} />
         {badge && badge > 0 ? (
           <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-black grid place-items-center ring-2 ring-card animate-pulse">
             {badge > 9 ? "9+" : badge}
           </span>
         ) : null}
       </span>
-      <span className="leading-none text-[9px] truncate max-w-[56px]">{label}</span>
+      <span className="leading-none text-[9px] truncate max-w-[56px] uppercase tracking-[0.12em] font-bold drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]">{label}</span>
     </Link>
   );
 }
