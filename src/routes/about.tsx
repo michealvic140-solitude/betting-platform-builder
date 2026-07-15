@@ -10,7 +10,9 @@ export const Route = createFileRoute("/about")({
       { name: "description", content: "What the E-Football Competition Bet is, how virtual tokens work, and our community standards." },
       { property: "og:title", content: "About ECB" },
       { property: "og:description", content: "Virtual-token competitive shooting. No real money gambling." },
+      { property: "og:url", content: "/about" },
     ],
+    links: [{ rel: "canonical", href: "/about" }],
   }),
   component: AboutPage,
 });
@@ -33,14 +35,14 @@ function AboutPage() {
           ].map((c) => (
             <Card key={c.title} className="glass p-5">
               <c.icon className="h-6 w-6 text-gold" />
-              <h3 className="font-bold mt-3">{c.title}</h3>
+              <h2 className="font-bold mt-3">{c.title}</h2>
               <p className="text-sm text-muted-foreground mt-1">{c.body}</p>
             </Card>
           ))}
         </div>
 
         <Card className="glass-strong mt-8 p-6 border-[var(--emerald)]/30">
-          <h3 className="font-bold">A note on responsibility</h3>
+          <h2 className="font-bold">A note on responsibility</h2>
           <p className="text-sm text-muted-foreground mt-2">
             ECB is designed for entertainment. Tokens are not redeemable for cash and may not be transferred outside the platform. If wagering — even with virtual tokens — stops feeling fun, take a break.
           </p>
