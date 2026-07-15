@@ -32,7 +32,7 @@ export function CookieConsent() {
   if (!show) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[80] p-3 sm:p-4 pointer-events-none">
+    <div className="fixed inset-x-0 bottom-0 z-[110] p-3 sm:p-4 pointer-events-none">
       <div className="pointer-events-auto mx-auto max-w-2xl animate-in slide-in-from-bottom-6 fade-in duration-500">
         <div className="relative overflow-hidden rounded-2xl border border-primary/40 bg-gradient-to-br from-card/95 to-card/90 backdrop-blur-xl shadow-[0_10px_40px_-8px_rgba(212,175,55,0.55)] p-4 sm:p-5">
           <div className="pointer-events-none absolute -top-10 -right-10 h-32 w-32 rounded-full bg-primary/20 blur-3xl" />
